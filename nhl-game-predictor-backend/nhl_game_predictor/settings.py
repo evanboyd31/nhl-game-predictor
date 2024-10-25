@@ -77,10 +77,15 @@ WSGI_APPLICATION = 'nhl_game_predictor.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nhlgamepredictordb',  # The database name
+        'USER': 'postgres',             # Your database username
+        'PASSWORD': 'password',         # Your database password
+        'HOST': 'localhost',            # The hostname (leave as 'localhost' if it's on the same server)
+        'PORT': '5432',                 # The PostgreSQL port (5432 is the default)
     }
 }
+
 
 
 # Password validation
