@@ -1,0 +1,50 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Django
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Local settings
+/local_settings.py
+
+# Django migrations
+# */migrations/*.py
+# */migrations/__pycache__/
+# !*/migrations/__init__.py
+
+# Static files
+staticfiles/
+static/
+
+# Media files
+media/
+
+# Virtual environments
+venv/
+.env
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# MacOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+
+# Other
+*.bak
+*.tmp
+
+nhl-game-predictor-backend/
