@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
@@ -56,12 +57,9 @@ class Game(models.Model):
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_games')
     away_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='away_games')
     winning_team = models.ForeignKey(Team, on_delete=models.CASCASE, related_name='won_games')
-    
+
     # date of game
     game_date = models.DateField()
-    
-    # Game status (e.g., scheduled, completed)
-    status = models.CharField(max_length=20)  # e.g., "Scheduled", "Completed", "Postponed"
 
     # game type
     PRESEASON = 1
@@ -92,3 +90,7 @@ class Game(models.Model):
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.game_date.strftime('%Y-%m-%d %H:%M')}"
+    
+    def is_completed(self):
+        current_date = datetime.now().date
+        return current_date > self.game_date
