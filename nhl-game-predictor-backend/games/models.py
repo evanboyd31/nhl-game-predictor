@@ -38,7 +38,17 @@ class TeamData(models.Model):
 
   # win/loss streak stats
   streak_count = models.IntegerField(default=0)
-  streak_code = models.CharField(max_length=1)
+
+  WIN = 0
+  LOSS = 1
+  OVERTIME = 2
+  STREAK_CODE_CHOICES = [
+      (WIN, 'Win'),
+      (LOSS, 'LOSS'),
+      (OVERTIME, 'Overtime')
+  ]
+  streak_code = models.IntegerField(choices=STREAK_CODE_CHOICES, 
+                                    default=LOSS)
 
   class Meta:
       unique_together = ('team', 'data_capture_date')
