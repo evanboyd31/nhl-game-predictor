@@ -37,18 +37,20 @@ class TeamData(models.Model):
   l10_losses = models.IntegerField(default=0)
 
   # win/loss streak stats
-  streak_count = models.IntegerField(default=0)
+  streak_count = models.IntegerField(default=0, null=True)
 
   WIN = 0
   LOSS = 1
   OVERTIME = 2
+  FIRST_GAME = 3
   STREAK_CODE_CHOICES = [
       (WIN, 'Win'),
       (LOSS, 'LOSS'),
-      (OVERTIME, 'Overtime')
+      (OVERTIME, 'Overtime'),
+      (FIRST_GAME, 'First Game')
   ]
   streak_code = models.IntegerField(choices=STREAK_CODE_CHOICES, 
-                                    default=LOSS)
+                                    default=FIRST_GAME)
 
   class Meta:
       unique_together = ('team', 'data_capture_date')
