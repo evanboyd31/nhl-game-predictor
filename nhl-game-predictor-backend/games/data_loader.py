@@ -60,6 +60,8 @@ def load_teams_data_from_api():
 
 def create_or_update_team_data(team_standings, team, date):
     # get all remaining statistics from the json response
+    season = team_standings.get("seasonId")
+    print(season)
     games_played = team_standings.get("gamesPlayed")
     wins = team_standings.get("wins")
     losses = team_standings.get("losses")
@@ -74,25 +76,27 @@ def create_or_update_team_data(team_standings, team, date):
     streak_count = team_standings.get("streakCount", 0)
     streak_code = RESULT_MAP.get(team_standings.get("streakCode", "FG"))
     team_data = TeamData(team=team,
-                            data_capture_date=date,
-                            games_played=games_played,
-                            wins=wins,
-                            losses=losses,
-                            ot_losses=ot_losses,
-                            points=points,
-                            goals_for=goals_for,
-                            goals_against=goals_against,
-                            goal_differential=goal_differential,
-                            l10_games_played=l10_games_played,
-                            l10_wins=l10_wins,
-                            l10_losses=l10_losses,
-                            streak_count=streak_count,
-                            streak_code=streak_code)
+                        data_capture_date=date,
+                        season=season,
+                        games_played=games_played,
+                        wins=wins,
+                        losses=losses,
+                        ot_losses=ot_losses,
+                        points=points,
+                        goals_for=goals_for,
+                        goals_against=goals_against,
+                        goal_differential=goal_differential,
+                        l10_games_played=l10_games_played,
+                        l10_wins=l10_wins,
+                        l10_losses=l10_losses,
+                        streak_count=streak_count,
+                        streak_code=streak_code)
     
     team_data, _ = TeamData.objects.update_or_create(
         team=team,
         data_capture_date=date,
         defaults={
+            'season': season,
             'games_played': games_played,
             'wins': wins,
             'losses': losses,
@@ -205,6 +209,7 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
         # iterate over all games
         for game_json in games_json:
             game_id = game_json.get("id")
+            game_season = game_json.get("season")
             game_type = game_json.get("gameType")
 
             # only create game data when it is not preseason game
@@ -239,6 +244,7 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
                     away_team_data = load_team_data_for_date_from_api(team_abbreviation=away_team_abbreviation,
                                                                     game_date=game_date)
                 game = Game(id=game_id,
+                            season=game_season,
                             home_team=home_team,
                             away_team=away_team,
                             winning_team=winning_team,
