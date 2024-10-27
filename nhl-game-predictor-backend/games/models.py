@@ -56,7 +56,7 @@ class Game(models.Model):
     # home and away teams
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_games')
     away_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='away_games')
-    winning_team = models.ForeignKey(Team, on_delete=models.CASCASE, related_name='won_games')
+    winning_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='won_games', null=True)
 
     # date of game
     game_date = models.DateField()
