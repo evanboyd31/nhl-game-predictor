@@ -10,20 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+from dotenv import load_dotenv
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-351^jg%5p_o_3ho%u#dv^)p+f&ro#zx2+7+qut*l%%jzgm(a$w'
+SECRET_KEY = os.getenv("SECRET_KEY", "default_security_key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -78,11 +81,11 @@ WSGI_APPLICATION = 'nhl_game_predictor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nhlgamepredictordb',  # The database name
-        'USER': 'postgres',             # Your database username
-        'PASSWORD': 'password',         # Your database password
-        'HOST': 'localhost',            # The hostname (leave as 'localhost' if it's on the same server)
-        'PORT': '5432',                 # The PostgreSQL port (5432 is the default)
+        'NAME': os.getenv("DATABASE_NAME"),  # The database name
+        'USER': os.getenv("DATABASE_USER"),             # Your database username
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"),         # Your database password
+        'HOST': os.getenv("DATABASE_HOST"),            # The hostname (leave as 'localhost' if it's on the same server)
+        'PORT': os.getenv("DATABASE_PORT"),                 # The PostgreSQL port (5432 is the default)
     }
 }
 
@@ -128,3 +131,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+NHL_API_BASE_URL = "https://api-web.nhle.com/v1/"
