@@ -49,15 +49,31 @@ class Game(models.Model):
     """
     Class to represent a single NHL game
     """
+    # stores game ID from the NHL API
+    id = models.BigIntegerField(primary_key=True)
+
     # home and away teams
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_games')
     away_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='away_games')
+    winning_team = models.ForeignKey(Team, on_delete=models.CASCASE, related_name='won_games')
     
     # date of game
     game_date = models.DateField()
     
     # Game status (e.g., scheduled, completed)
     status = models.CharField(max_length=20)  # e.g., "Scheduled", "Completed", "Postponed"
+
+    # game type
+    PRESEASON = 1
+    REGULAR_SEASON = 2
+    PLAYOFFS = 3
+    GAME_TYPE_CHOICES = [
+        (PRESEASON, "Preseason"),
+        (REGULAR_SEASON, "Regular Season"),
+        (PLAYOFFS, "Playoffs")
+    ]
+
+    game_type = models.IntegerField(choices=GAME_TYPE_CHOICES, null=True)
 
     # goals
     home_team_goals = models.IntegerField(default=0)
