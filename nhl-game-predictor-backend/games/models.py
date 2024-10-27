@@ -18,6 +18,7 @@ class TeamData(models.Model):
 
   # date for which this data was recorded
   data_capture_date = models.DateField()
+  season = models.BigIntegerField(null=True)
 
   # simple team record states
   games_played = models.IntegerField(default=0)
@@ -64,6 +65,7 @@ class Game(models.Model):
     """
     # stores game ID from the NHL API
     id = models.BigIntegerField(primary_key=True)
+    season = models.BigIntegerField(null=True)
 
     # home and away teams
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_games')
