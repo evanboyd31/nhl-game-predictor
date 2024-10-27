@@ -20,24 +20,24 @@ class TeamData(models.Model):
   data_capture_date = models.DateField()
 
   # simple team record states
-  games_played = models.IntegerField()
-  wins = models.IntegerField()
-  losses = models.IntegerField()
-  ot_losses = models.IntegerField()
-  points = models.IntegerField()
+  games_played = models.IntegerField(default=0)
+  wins = models.IntegerField(default=0)
+  losses = models.IntegerField(default=0)
+  ot_losses = models.IntegerField(default=0)
+  points = models.IntegerField(default=0)
   
   # team goal statistics
-  goals_for = models.IntegerField()
-  goals_against = models.IntegerField()
-  goal_differential = models.IntegerField()
+  goals_for = models.IntegerField(default=0)
+  goals_against = models.IntegerField(default=0)
+  goal_differential = models.IntegerField(default=0)
 
   # team record stats for the last 10 games
-  l10_games_played = models.IntegerField()
-  l10_wins = models.IntegerField()
-  l10_losses = models.IntegerField()
+  l10_games_played = models.IntegerField(default=0)
+  l10_wins = models.IntegerField(default=0)
+  l10_losses = models.IntegerField(default=0)
 
   # win/loss streak stats
-  streak_count = models.IntegerField()
+  streak_count = models.IntegerField(default=0)
   streak_code = models.CharField(max_length=1)
 
   class Meta:
