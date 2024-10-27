@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "nhl-game-predictor-backend"
+version = "0.1.0"
+description = ""
+authors = ["Evan Boyd <evan.boyd@mail.mcgill.ca>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+Django = "^5.1.2"
+psycopg2 = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
