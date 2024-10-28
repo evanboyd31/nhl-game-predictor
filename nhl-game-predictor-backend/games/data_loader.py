@@ -7,6 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 from django.conf import settings
 from games.models import Team, Game, TeamData
 from datetime import datetime, timedelta
+from django.db import transaction
 
 # mapping from API-provided strings to integer values for GameData model class
 RESULT_MAP = {
@@ -19,6 +20,7 @@ RESULT_MAP = {
 # reverse results map
 REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
+@transaction.atomic
 def load_teams_data_from_api():
     """
     using the NHL API, load each NHL team's name, abbreviation, and logo url
@@ -32,14 +34,12 @@ def load_teams_data_from_api():
     standings_url = f"{settings.NHL_API_BASE_URL}standings/{formatted_date}"
 
     team_standings_response = httpx.get(standings_url)
-    print(team_standings_response)
 
     # exit if API is down
     if team_standings_response.status_code != 200:
         return
     
     team_standings = team_standings_response.json().get("standings", [])
-    print(team_standings)
     teams = []
 
     for team_json in team_standings:
@@ -58,10 +58,10 @@ def load_teams_data_from_api():
     # bulk create all new teams identified in above for loop
     Team.objects.bulk_create(teams)
 
+@transaction.atomic
 def create_or_update_team_data(team_standings, team, date):
     # get all remaining statistics from the json response
     season = team_standings.get("seasonId")
-    print(season)
     games_played = team_standings.get("gamesPlayed")
     wins = team_standings.get("wins")
     losses = team_standings.get("losses")
@@ -115,6 +115,7 @@ def create_or_update_team_data(team_standings, team, date):
 
     return team_data
 
+@transaction.atomic
 def load_team_data_for_date_from_api(team_abbreviation, game_date):
 
     # ensure team exists
@@ -152,6 +153,7 @@ def load_team_data_for_date_from_api(team_abbreviation, game_date):
 
         return team_data
 
+@transaction.atomic
 def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
     """
     given the abbreviation of a team, load Game and GameData model instances
@@ -277,6 +279,15 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
         'away_team_data'
     ])
 
+@transaction.atomic
+def load_games_for_all_teams_from_api(past_seasons=0):
+    teams = Team.objects.all()
+
+    for team in teams:
+        load_games_for_team_from_api(team_abbreviation=team.abbreviation,
+                                     past_seasons=past_seasons)
+    
+@transaction.atomic
 def clear_database():
     Team.objects.all().delete()
     Game.objects.all().delete()
