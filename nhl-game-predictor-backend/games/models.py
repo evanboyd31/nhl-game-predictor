@@ -26,6 +26,8 @@ class TeamData(models.Model):
   """
   Class to records the team's statistics for a provided day for model training
   """
+
+  team_data_json = models.JSONField(default=dict)
   # associated to a team
   team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_data')
 
@@ -76,6 +78,8 @@ class Game(models.Model):
     """
     Class to represent a single NHL game
     """
+
+    game_json = models.JSONField(default=dict)
     # stores game ID from the NHL API
     id = models.BigIntegerField(primary_key=True)
     season = models.BigIntegerField(null=True)
