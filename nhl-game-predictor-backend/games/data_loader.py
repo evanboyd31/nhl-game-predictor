@@ -114,13 +114,15 @@ def create_or_update_team_data(team_standings, team, date):
                         l10_wins=l10_wins,
                         l10_losses=l10_losses,
                         streak_count=streak_count,
-                        streak_code=streak_code)
+                        streak_code=streak_code,
+                        team_data_json=team_standings)
     
     team_data, _ = TeamData.objects.update_or_create(
         team=team,
         data_capture_date=date,
         defaults={
             'season': season,
+            'team_data_json': team_standings,
             'games_played': games_played,
             'wins': wins,
             'losses': losses,
@@ -171,11 +173,14 @@ def load_team_data_for_date_from_api(team_abbreviation, game_date):
     else:
         # if standings is blank, it is the first game of the season, so only supply date and team
         # all other fields will default to zero
-        team_data = TeamData(team=team,
-                             data_capture_date=previous_day)
-        team_data.save()
+        if not TeamData.objects.filter(team=team, data_capture_date=previous_day).exists():
+            team_data = TeamData(team=team,
+                                data_capture_date=previous_day)
+            team_data.save()
 
-        return team_data
+            return team_data
+        else:
+            return TeamData.objects.filter(team=team, data_capture_date=previous_day).first()
 
 @transaction.atomic
 def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
@@ -259,16 +264,18 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
                 home_team_data = None
                 away_team_data = None
                 if game_date < current_date:
-                    home_team_goals = home_team_json.get("score")
-                    away_team_goals = away_team_json.get("score")
-                    is_overtime = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "OT"
-                    is_shootout = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "SO"
+                    home_team_goals = home_team_json.get("score", 0)
+                    away_team_goals = away_team_json.get("score", 0)
 
-                    winning_team = home_team if home_team_goals > away_team_goals else away_team
-                    home_team_data = load_team_data_for_date_from_api(team_abbreviation=home_team_abbreviation,
-                                                                    game_date=game_date)
-                    away_team_data = load_team_data_for_date_from_api(team_abbreviation=away_team_abbreviation,
-                                                                    game_date=game_date)
+                    if not (home_team_goals == 0 and away_team_goals ==0):
+                        is_overtime = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "OT"
+                        is_shootout = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "SO"
+
+                        winning_team = home_team if home_team_goals > away_team_goals else away_team
+                        home_team_data = load_team_data_for_date_from_api(team_abbreviation=home_team_abbreviation,
+                                                                        game_date=game_date)
+                        away_team_data = load_team_data_for_date_from_api(team_abbreviation=away_team_abbreviation,
+                                                                        game_date=game_date)
                 game = Game(id=game_id,
                             season=game_season,
                             home_team=home_team,
@@ -281,7 +288,8 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
                             is_overtime=is_overtime,
                             is_shootout=is_shootout,
                             home_team_data=home_team_data,
-                            away_team_data=away_team_data)
+                            away_team_data=away_team_data,
+                            game_json=game_json)
                 
                 # if no game already exists, add it to the bulk_create list, otherwise add it to bulk_update list
                 if Game.objects.filter(id=game_id).count() == 0:
