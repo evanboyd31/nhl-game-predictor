@@ -3,6 +3,7 @@ import httpx
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
+django.setup()
 
 from django.conf import settings
 from games.models import Franchise, Team, Game, TeamData
