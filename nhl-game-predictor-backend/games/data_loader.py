@@ -5,7 +5,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 
 from django.conf import settings
-from games.models import Team, Game, TeamData
+from games.models import Franchise, Team, Game, TeamData
 from datetime import datetime, timedelta
 from django.db import transaction
 
@@ -21,7 +21,32 @@ RESULT_MAP = {
 REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
 @transaction.atomic
-def load_teams_data_from_api():
+def load_franchises_and_teams_data_from_api():
+    franchise_url = f"https://api.nhle.com/stats/rest/en/team"
+    print(franchise_url)
+    franchise_response = httpx.get(franchise_url)
+    print(franchise_response)
+
+    franchise_json = franchise_response.json()
+    franchises_json = franchise_json.get("data", [])
+
+    teams = []
+    for franchise_json in franchises_json:
+        franchise_id = franchise_json.get("franchiseId")
+        if franchise_id is not None:
+            franchise, _ = Franchise.objects.get_or_create(franchise_id=franchise_id)
+            team_full_name = franchise_json.get("fullName")
+            team_abbreviation = franchise_json.get("triCode")
+            team = Team(name=team_full_name,
+                        abbreviation=team_abbreviation,
+                        franchise=franchise)
+            teams.append(team)
+    
+    Team.objects.bulk_create(teams)
+
+
+@transaction.atomic
+def load_active_team_logo_urls():
     """
     using the NHL API, load each NHL team's name, abbreviation, and logo url
     into a Team model class and store in the db
@@ -44,19 +69,18 @@ def load_teams_data_from_api():
 
     for team_json in team_standings:
         # get team fields from current json
-        name = team_json.get("teamCommonName", {}).get("default", "")
         abbreviation = team_json.get("teamAbbrev", {}).get("default", "")
         logo_url = team_json.get("teamLogo", "")
 
         # ensure that the team doesn't already exist in the db
-        if Team.objects.filter(name=name).count() == 0:
-            team = Team(name=name,
-                        abbreviation=abbreviation,
-                        logo_url=logo_url)
+        if Team.objects.filter(abbreviation=abbreviation).count() != 0:
+            team = Team.objects.filter(abbreviation=abbreviation).first()
+            team.logo_url = logo_url
             teams.append(team)
+            
     
     # bulk create all new teams identified in above for loop
-    Team.objects.bulk_create(teams)
+    Team.objects.bulk_update(teams, fields=['logo_url'])
 
 @transaction.atomic
 def create_or_update_team_data(team_standings, team, date):
