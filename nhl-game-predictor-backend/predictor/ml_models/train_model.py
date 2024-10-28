@@ -9,14 +9,15 @@ django.setup()
 
 class GameDataFrameEntry:
     """
-    class to capture game data in pandas data frame used for training.
-    all data must be integers, so this is why we have a separate class
+    Class to capture game data in a pandas DataFrame used for training.
+    All data must be integers, which is why we have a separate class.
     """
-    def __init__(self, game : Game):
+    def __init__(self, game: Game):
         # inputs
         game_json = game.game_json
         home_team_data = game.home_team_data
-        away_team_data = game.home_team_data
+        away_team_data = game.away_team_data 
+        
         self.home_team = game.home_team.pk
         self.away_team = game.away_team.pk
         self.game_type = game.game_type
@@ -31,12 +32,12 @@ class GameDataFrameEntry:
         self.home_team_goals_against = home_team_data.goals_against
         self.home_team_goal_differential = home_team_data.goal_differential
         self.home_team_l10_games_played = home_team_data.l10_games_played
-        self.home_team_l10_wins = home_team_data.wins
-        self.home_team_l10_losses = home_team_data.losses
+        self.home_team_l10_wins = home_team_data.l10_wins  
+        self.home_team_l10_losses = home_team_data.l10_losses 
         self.home_team_streak_count = home_team_data.streak_count
         self.home_team_streak_code = home_team_data.streak_code
 
-        # Away team data
+        # away team data
         self.away_team_games_played = away_team_data.games_played
         self.away_team_wins = away_team_data.wins
         self.away_team_losses = away_team_data.losses
@@ -46,33 +47,88 @@ class GameDataFrameEntry:
         self.away_team_goals_against = away_team_data.goals_against
         self.away_team_goal_differential = away_team_data.goal_differential
         self.away_team_l10_games_played = away_team_data.l10_games_played
-        self.away_team_l10_wins = away_team_data.l10_wins  # Ensure this is the wins in the last 10 games
-        self.away_team_l10_losses = away_team_data.l10_losses  # Ensure this is the losses in the last 10 games
+        self.away_team_l10_wins = away_team_data.l10_wins
+        self.away_team_l10_losses = away_team_data.l10_losses
         self.away_team_streak_count = away_team_data.streak_count
         self.away_team_streak_code = away_team_data.streak_code
 
-        # labels (winning team, goals score for each team)
-        self.winning_team = game.winning_team.pk
+        # labels (winning team, goals scored for each team)
+        self.winning_team = game.winning_team.pk if game.winning_team else None
         self.home_team_goals = game.home_team_goals
         self.away_team_goals = game.away_team_goals
+
+    def to_dict(self):
+        """
+        convert the instance to a dictionary for easy DataFrame creation.
+        """
+        return {
+            "home_team": self.home_team,
+            "away_team": self.away_team,
+            "game_type": self.game_type,
+            "home_team_games_played": self.home_team_games_played,
+            "home_team_wins": self.home_team_wins,
+            "home_team_losses": self.home_team_losses,
+            "home_team_ot_losses": self.home_team_ot_losses,
+            "home_team_points": self.home_team_points,
+            "home_team_goals_for": self.home_team_goals_for,
+            "home_team_goals_against": self.home_team_goals_against,
+            "home_team_goal_differential": self.home_team_goal_differential,
+            "home_team_l10_games_played": self.home_team_l10_games_played,
+            "home_team_l10_wins": self.home_team_l10_wins,
+            "home_team_l10_losses": self.home_team_l10_losses,
+            "home_team_streak_count": self.home_team_streak_count,
+            "home_team_streak_code": self.home_team_streak_code,
+            "away_team_games_played": self.away_team_games_played,
+            "away_team_wins": self.away_team_wins,
+            "away_team_losses": self.away_team_losses,
+            "away_team_ot_losses": self.away_team_ot_losses,
+            "away_team_points": self.away_team_points,
+            "away_team_goals_for": self.away_team_goals_for,
+            "away_team_goals_against": self.away_team_goals_against,
+            "away_team_goal_differential": self.away_team_goal_differential,
+            "away_team_l10_games_played": self.away_team_l10_games_played,
+            "away_team_l10_wins": self.away_team_l10_wins,
+            "away_team_l10_losses": self.away_team_l10_losses,
+            "away_team_streak_count": self.away_team_streak_count,
+            "away_team_streak_code": self.away_team_streak_code,
+            "winning_team": self.winning_team,
+            "home_team_goals": self.home_team_goals,
+            "away_team_goals": self.away_team_goals,
+        }
 
 def generate_past_season_ids(past_seasons):
     current_date = datetime.now()
     current_month = current_date.month
     current_year = current_date.year
     
-    # determine the current season based on the month
     if current_month >= 7:  # July or later
         current_season_start_year = current_year
     else:  # January to June
         current_season_start_year = current_year - 1
-    
+
     season_ids = []
     
-    # generate IDs for the specified number of past seasons
     for i in range(past_seasons):
         year_start = current_season_start_year - (i + 1)
         season_id = f"{year_start}{year_start + 1}"
         season_ids.append(int(season_id))
     
     return season_ids
+
+def create_data_frame(past_seasons):
+    seasons = generate_past_season_ids(past_seasons)
+    # Fetch all Game records for the specified past seasons
+    games = Game.objects.filter(season__in=seasons)
+
+    # Create GameDataFrameEntry instances for each game
+    game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
+
+    # Convert the list of entries to a list of dictionaries
+    game_data_dicts = [entry.to_dict() for entry in game_dataframe_entries]
+
+    # Create a DataFrame from the list of dictionaries
+    team_data_df = pd.DataFrame(game_data_dicts)
+
+    # Display the DataFrame
+    print(team_data_df.head())
+
