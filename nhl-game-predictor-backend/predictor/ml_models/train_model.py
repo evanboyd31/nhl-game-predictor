@@ -55,3 +55,24 @@ class GameDataFrameEntry:
         self.winning_team = game.winning_team.pk
         self.home_team_goals = game.home_team_goals
         self.away_team_goals = game.away_team_goals
+
+def generate_past_season_ids(past_seasons):
+    current_date = datetime.now()
+    current_month = current_date.month
+    current_year = current_date.year
+    
+    # determine the current season based on the month
+    if current_month >= 7:  # July or later
+        current_season_start_year = current_year
+    else:  # January to June
+        current_season_start_year = current_year - 1
+    
+    season_ids = []
+    
+    # generate IDs for the specified number of past seasons
+    for i in range(past_seasons):
+        year_start = current_season_start_year - (i + 1)
+        season_id = f"{year_start}{year_start + 1}"
+        season_ids.append(int(season_id))
+    
+    return season_ids
