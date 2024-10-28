@@ -1,7 +1,20 @@
 from django.db import models
 from datetime import datetime
 
+
+class Franchise(models.Model):
+    """
+    A model to represent a franchise, which can have multiple team representations
+    due to relocations or rebranding.
+    """
+    franchise_id = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return f"Franchise ID: {self.franchise_id}"
+
+
 class Team(models.Model):
+    franchise = models.ForeignKey(Franchise, on_delete=models.CASCADE, related_name='teams', null=True)
     name = models.CharField(max_length=100)
     abbreviation = models.CharField(max_length=3, unique=True)
     logo_url = models.URLField()
