@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Team, TeamData, Game
+from .models import Franchise, Team, TeamData, Game
 
 # Register your models here.
+
+@admin.register(Franchise)
+class FranchiseAdmin(admin.ModelAdmin):
+    list_display = ('franchise_id',)
+    search_fields = ('franchise_id',)
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'abbreviation')
