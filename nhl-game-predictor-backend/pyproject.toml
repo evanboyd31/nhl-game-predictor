@@ -13,6 +13,7 @@ python-dotenv = "^1.0.1"
 requests = "^2.32.3"
 httpx = "^0.27.2"
 datetime = "^5.5"
+scikit-learn = "^1.5.2"
 
 
 [build-system]
