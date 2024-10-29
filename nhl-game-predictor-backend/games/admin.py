@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Team, TeamData, Game
+from .models import Franchise, Team, TeamData, Game
 
 # Register your models here.
+
+@admin.register(Franchise)
+class FranchiseAdmin(admin.ModelAdmin):
+    list_display = ('franchise_id',)
+    search_fields = ('franchise_id',)
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'abbreviation')
@@ -10,7 +16,7 @@ class TeamAdmin(admin.ModelAdmin):
 # TeamData Admin configuration
 @admin.register(TeamData)
 class TeamDataAdmin(admin.ModelAdmin):
-    list_display = ('team', 'data_capture_date', 'games_played', 'wins', 'losses', 'points')
+    list_display = ('team', 'data_capture_date')
     list_filter = ('team', 'data_capture_date')
     search_fields = ('team__name', 'team__abbreviation')
     date_hierarchy = 'data_capture_date'
@@ -19,8 +25,8 @@ class TeamDataAdmin(admin.ModelAdmin):
 # Game Admin configuration
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('home_team', 'away_team', 'game_date', 'game_type', 'home_team_goals', 'away_team_goals', 'is_completed')
-    list_filter = ('game_type', 'game_date', 'home_team', 'away_team')
+    list_display = ('home_team', 'away_team', 'game_date')
+    list_filter = ('game_date', 'home_team', 'away_team')
     search_fields = ('home_team__name', 'away_team__name')
     date_hierarchy = 'game_date'
 
