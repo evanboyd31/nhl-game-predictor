@@ -114,7 +114,7 @@ def load_team_data_for_date_from_api(team : Team, game_date):
         return None
 
 @transaction.atomic
-def load_games_for_team_from_api(team_abbreviation, seasons):
+def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True):
     """
     given the abbreviation of a team, load Game and GameData model instances
     into the db. 
@@ -159,7 +159,7 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
             away_team_goals = away_team_json.get("score", 0)
 
             # only create game data when it is not preseason game, in the past, has a winner, and doesn't already exist
-            if game_type != Game.PRESEASON and game_date < current_date and not (home_team_goals == 0 and away_team_goals ==0) and Game.objects.filter(id=game_id).count() == 0:
+            if game_type != Game.PRESEASON and Game.objects.filter(id=game_id).count() == 0:
 
                 away_team_abbreviation = away_team_json.get("abbrev")
                 away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
@@ -167,12 +167,15 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
                 home_team_abbreviation = home_team_json.get("abbrev")
                 home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
 
-
-                winning_team = home_team if home_team_goals > away_team_goals else away_team
-                home_team_data = load_team_data_for_date_from_api(team=home_team,
-                                                                  game_date=game_date)
-                away_team_data = load_team_data_for_date_from_api(team=away_team,
-                                                                  game_date=game_date)
+                winning_team = None
+                home_team_data = None
+                away_team_data = None
+                if game_date < current_date and get_team_data and not (home_team_goals == 0 and away_team_goals == 0):
+                    winning_team = home_team if home_team_goals > away_team_goals else away_team
+                    home_team_data = load_team_data_for_date_from_api(team=home_team,
+                                                                    game_date=game_date)
+                    away_team_data = load_team_data_for_date_from_api(team=away_team,
+                                                                    game_date=game_date)
                     
 
                 game = Game(id=game_id,
@@ -205,12 +208,13 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
     Game.objects.bulk_create(games_to_create)
 
 @transaction.atomic
-def load_games_for_all_teams_from_api(seasons):
+def load_games_for_all_teams_from_api(seasons, get_team_data=True):
     teams = Team.objects.all()
 
     for team in teams:
         load_games_for_team_from_api(team_abbreviation=team.abbreviation,
-                                     seasons=seasons)
+                                     seasons=seasons,
+                                     get_team_data=get_team_data)
     
 @transaction.atomic
 def clear_database():
