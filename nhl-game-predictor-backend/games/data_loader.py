@@ -24,9 +24,7 @@ REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 @transaction.atomic
 def load_franchises_and_teams_data_from_api():
     franchise_url = f"https://api.nhle.com/stats/rest/en/team"
-    print(franchise_url)
     franchise_response = httpx.get(franchise_url)
-    print(franchise_response)
 
     franchise_json = franchise_response.json()
     franchises_json = franchise_json.get("data", [])
@@ -83,78 +81,17 @@ def load_active_team_logo_urls():
     # bulk create all new teams identified in above for loop
     Team.objects.bulk_update(teams, fields=['logo_url'])
 
-@transaction.atomic
-def create_or_update_team_data(team_standings, team, date):
-    # get all remaining statistics from the json response
-    season = team_standings.get("seasonId")
-    games_played = team_standings.get("gamesPlayed")
-    wins = team_standings.get("wins")
-    losses = team_standings.get("losses")
-    ot_losses = team_standings.get("otLosses")
-    points = team_standings.get("points")
-    goals_for = team_standings.get("goalFor")
-    goals_against = team_standings.get("goalAgainst")
-    goal_differential = team_standings.get("goalDifferential")
-    l10_games_played = team_standings.get("l10GamesPlayed")
-    l10_wins = team_standings.get("l10Wins")
-    l10_losses = team_standings.get("l10Losses")
-    streak_count = team_standings.get("streakCount", 0)
-    streak_code = RESULT_MAP.get(team_standings.get("streakCode", "FG"))
-    team_data = TeamData(team=team,
-                        data_capture_date=date,
-                        season=season,
-                        games_played=games_played,
-                        wins=wins,
-                        losses=losses,
-                        ot_losses=ot_losses,
-                        points=points,
-                        goals_for=goals_for,
-                        goals_against=goals_against,
-                        goal_differential=goal_differential,
-                        l10_games_played=l10_games_played,
-                        l10_wins=l10_wins,
-                        l10_losses=l10_losses,
-                        streak_count=streak_count,
-                        streak_code=streak_code,
-                        team_data_json=team_standings)
-    
-    team_data, _ = TeamData.objects.update_or_create(
-        team=team,
-        data_capture_date=date,
-        defaults={
-            'season': season,
-            'team_data_json': team_standings,
-            'games_played': games_played,
-            'wins': wins,
-            'losses': losses,
-            'ot_losses': ot_losses,
-            'points': points,
-            'goals_for': goals_for,
-            'goals_against': goals_against,
-            'goal_differential': goal_differential,
-            'l10_games_played': l10_games_played,
-            'l10_wins': l10_wins,
-            'l10_losses': l10_losses,
-            'streak_count': streak_count,
-            'streak_code': streak_code,
-        }
-    )
-
-    return team_data
 
 @transaction.atomic
-def load_team_data_for_date_from_api(team_abbreviation, game_date):
-
-    # ensure team exists
-    team = Team.objects.filter(abbreviation=team_abbreviation).first()
-    if team is None:
-        return
+def load_team_data_for_date_from_api(team : Team, game_date):
 
     # get the date before a game
     previous_day = game_date - timedelta(days=1)
 
     # check to see if we already have the data for the given team and date
-    previous_team_data = TeamData.objects.filter(team__abbreviation=team_abbreviation, data_capture_date=previous_day).first()
+    previous_team_data = TeamData.objects.filter(team=team, data_capture_date=previous_day).first()
+    if previous_team_data is not None:
+        return None
 
 
     # format the standings URL for the given date
@@ -166,22 +103,15 @@ def load_team_data_for_date_from_api(team_abbreviation, game_date):
 
     if len(standings_json) != 0:
         for team_standings in standings_json:
-            if team_standings.get("teamAbbrev", {}).get("default", "") == team_abbreviation:
-                team_data = create_or_update_team_data(team_standings=team_standings,
-                                                       team=team,
-                                                       date=previous_day)
+            if team_standings.get("teamAbbrev", {}).get("default", "") == team.abbreviation:
+                team_data = TeamData(team_data_json=team_standings,
+                                     team=team,
+                                     data_capture_date=previous_day)
                 return team_data
     else:
         # if standings is blank, it is the first game of the season, so only supply date and team
         # all other fields will default to zero
-        if not TeamData.objects.filter(team=team, data_capture_date=previous_day).exists():
-            team_data = TeamData(team=team,
-                                data_capture_date=previous_day)
-            team_data.save()
-
-            return team_data
-        else:
-            return TeamData.objects.filter(team=team, data_capture_date=previous_day).first()
+        return None
 
 @transaction.atomic
 def load_games_for_team_from_api(team_abbreviation, seasons):
@@ -189,11 +119,8 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
     given the abbreviation of a team, load Game and GameData model instances
     into the db. 
     
-    the past_seasons parameter indicates how many seasons in the past
-    we should fetch. for instance,
-    
-    - if the current season is 2024-2025, and past_seasons = 0, then we fetch game data for 2024-2025
-    - if the current season is 2024-2025, and past_seasons = 2, we fetch game data for 2024-2025, 2023-2024, and 2022-2023.
+    the seasons parameter is a list of season IDs that are compliant with the NHL API.
+    For example, the 2024-2025 season has an ID of 20242025
     
     """
 
@@ -207,7 +134,8 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
         raise ValueError(f"Please enter seasons to fetch game data for.")
     
     games_to_create = []
-    games_to_update = []
+    team_data_to_create = []
+    existing_team_data_keys = set()
 
     # used to see the completion status of a game
     current_date = datetime.now().date()
@@ -222,76 +150,59 @@ def load_games_for_team_from_api(team_abbreviation, seasons):
         # iterate over all games
         for game_json in games_json:
             game_id = game_json.get("id")
-            game_season = game_json.get("season")
             game_type = game_json.get("gameType")
+            game_date = datetime.strptime(game_json.get("gameDate"), "%Y-%m-%d").date()
 
-            # only create game data when it is not preseason game
-            if game_type != Game.PRESEASON:
-                game_date = datetime.strptime(game_json.get("gameDate"), "%Y-%m-%d").date()
+            home_team_json = game_json.get("homeTeam", {})
+            away_team_json = game_json.get("awayTeam", {})
+            home_team_goals = home_team_json.get("score", 0)
+            away_team_goals = away_team_json.get("score", 0)
 
-                away_team_json = game_json.get("awayTeam", {})
+            # only create game data when it is not preseason game, in the past, has a winner, and doesn't already exist
+            if game_type != Game.PRESEASON and game_date < current_date and not (home_team_goals == 0 and away_team_goals ==0) and Game.objects.filter(id=game_id).count() == 0:
+
                 away_team_abbreviation = away_team_json.get("abbrev")
                 away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
 
-                home_team_json = game_json.get("homeTeam", {})
                 home_team_abbreviation = home_team_json.get("abbrev")
                 home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
 
-                # fields for when the game has been completed
-                home_team_goals = 0
-                away_team_goals = 0
-                is_overtime = False
-                is_shootout = False
-                winning_team = None
-                home_team_data = None
-                away_team_data = None
-                if game_date < current_date:
-                    home_team_goals = home_team_json.get("score", 0)
-                    away_team_goals = away_team_json.get("score", 0)
 
-                    if not (home_team_goals == 0 and away_team_goals ==0):
-                        is_overtime = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "OT"
-                        is_shootout = game_json.get("gameOutcome", {}).get("lastPeriodType", "REG") == "SO"
+                winning_team = home_team if home_team_goals > away_team_goals else away_team
+                home_team_data = load_team_data_for_date_from_api(team=home_team,
+                                                                  game_date=game_date)
+                away_team_data = load_team_data_for_date_from_api(team=away_team,
+                                                                  game_date=game_date)
+                    
 
-                        winning_team = home_team if home_team_goals > away_team_goals else away_team
-                        home_team_data = load_team_data_for_date_from_api(team_abbreviation=home_team_abbreviation,
-                                                                        game_date=game_date)
-                        away_team_data = load_team_data_for_date_from_api(team_abbreviation=away_team_abbreviation,
-                                                                        game_date=game_date)
                 game = Game(id=game_id,
-                            season=game_season,
+                            game_date=game_date,
+                            game_json=game_json,
                             home_team=home_team,
                             away_team=away_team,
                             winning_team=winning_team,
-                            game_date=game_date,
-                            game_type=game_type,
-                            home_team_goals=home_team_goals,
-                            away_team_goals=away_team_goals,
-                            is_overtime=is_overtime,
-                            is_shootout=is_shootout,
                             home_team_data=home_team_data,
-                            away_team_data=away_team_data,
-                            game_json=game_json)
-                
-                # if no game already exists, add it to the bulk_create list, otherwise add it to bulk_update list
-                if Game.objects.filter(id=game_id).count() == 0:
-                    games_to_create.append(game)
-                else:
-                    games_to_update.append(game)
+                            away_team_data=away_team_data)
+                games_to_create.append(game)
+
+                # check if home team data already exists in list
+                if home_team_data is not None:
+                    team_data_key = (home_team.id, home_team_data.data_capture_date)
+                    if team_data_key not in existing_team_data_keys:
+                        existing_team_data_keys.add(team_data_key)
+                        team_data_to_create.append(home_team_data)
+
+                # check if away team data already exists in list
+                if away_team_data is not None:
+                    team_data_key = (away_team.id, away_team_data.data_capture_date)
+                    if team_data_key not in existing_team_data_keys:
+                        existing_team_data_keys.add(team_data_key)
+                        team_data_to_create.append(away_team_data)
+
 
     # bulk create and update the respective games
+    TeamData.objects.bulk_create(team_data_to_create)
     Game.objects.bulk_create(games_to_create)
-    Game.objects.bulk_update(games_to_update, fields=[
-        'winning_team',
-        'home_team_goals',
-        'away_team_goals',
-        'is_overtime',
-        'is_shootout',
-        'game_type',
-        'game_date',
-        'home_team_data',
-        'away_team_data'
-    ])
 
 @transaction.atomic
 def load_games_for_all_teams_from_api(seasons):
