@@ -3,7 +3,7 @@ import django
 import pandas as pd
 from games.models import Game
 from datetime import datetime
-import numpy as np
+import pickle
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -210,3 +210,8 @@ def train_random_forest(past_seasons):
     # Evaluate the model
     accuracy = accuracy_score(testing_labels, predicted_labels)
     print("accuracy:", accuracy)
+
+    with open('./predictor/ml_models/trained_models/random_forest_model.pkl', 'wb') as file:
+        pickle.dump(random_forest, file)
+
+    print("Model saved successfully.")
