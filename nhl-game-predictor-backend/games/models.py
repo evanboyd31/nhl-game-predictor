@@ -23,56 +23,27 @@ class Team(models.Model):
         return f"{self.name} ({self.abbreviation})"
 
 class TeamData(models.Model):
-  """
-  Class to records the team's statistics for a provided day for model training
-  """
+    """
+    Class to record a team's statistics for a provided day for model training
+    """
 
-  team_data_json = models.JSONField(default=dict)
-  # associated to a team
-  team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_data')
+    # associated to a team
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_data')
+    # date that the data captures for
+    team_data_json = models.JSONField(default=dict)
 
-  # date for which this data was recorded
-  data_capture_date = models.DateField()
-  season = models.BigIntegerField(null=True)
+    data_capture_date = models.DateField()
 
-  # simple team record states
-  games_played = models.IntegerField(default=0)
-  wins = models.IntegerField(default=0)
-  losses = models.IntegerField(default=0)
-  ot_losses = models.IntegerField(default=0)
-  points = models.IntegerField(default=0)
-  
-  # team goal statistics
-  goals_for = models.IntegerField(default=0)
-  goals_against = models.IntegerField(default=0)
-  goal_differential = models.IntegerField(default=0)
+    WIN = 0
+    LOSS = 1
+    OVERTIME = 2
+    FIRST_GAME = 3
 
-  # team record stats for the last 10 games
-  l10_games_played = models.IntegerField(default=0)
-  l10_wins = models.IntegerField(default=0)
-  l10_losses = models.IntegerField(default=0)
+    class Meta:
+        unique_together = ('team', 'data_capture_date')
 
-  # win/loss streak stats
-  streak_count = models.IntegerField(default=0, null=True)
-
-  WIN = 0
-  LOSS = 1
-  OVERTIME = 2
-  FIRST_GAME = 3
-  STREAK_CODE_CHOICES = [
-      (WIN, 'Win'),
-      (LOSS, 'LOSS'),
-      (OVERTIME, 'Overtime'),
-      (FIRST_GAME, 'First Game')
-  ]
-  streak_code = models.IntegerField(choices=STREAK_CODE_CHOICES, 
-                                    default=FIRST_GAME)
-
-  class Meta:
-      unique_together = ('team', 'data_capture_date')
-
-  def __str__(self):
-      return f"{self.team} Data ({self.data_capture_date})"
+    def __str__(self):
+        return f"{self.team} Data ({self.data_capture_date})"
     
 class Game(models.Model):
     """

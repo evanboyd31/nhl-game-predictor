@@ -16,7 +16,7 @@ class TeamAdmin(admin.ModelAdmin):
 # TeamData Admin configuration
 @admin.register(TeamData)
 class TeamDataAdmin(admin.ModelAdmin):
-    list_display = ('team', 'data_capture_date', 'games_played', 'wins', 'losses', 'points')
+    list_display = ('team', 'data_capture_date')
     list_filter = ('team', 'data_capture_date')
     search_fields = ('team__name', 'team__abbreviation')
     date_hierarchy = 'data_capture_date'
