@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from games.views import GameListByDateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/games/date/', GameListByDateView.as_view(), name='game-list-by-date')
 ]
