@@ -49,11 +49,10 @@ class Game(models.Model):
     """
     Class to represent a single NHL game
     """
-
-    game_json = models.JSONField(default=dict)
     # stores game ID from the NHL API
     id = models.BigIntegerField(primary_key=True)
-    season = models.BigIntegerField(null=True)
+
+    game_json = models.JSONField(default=dict)
 
     # home and away teams
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_games')
@@ -67,21 +66,6 @@ class Game(models.Model):
     PRESEASON = 1
     REGULAR_SEASON = 2
     PLAYOFFS = 3
-    GAME_TYPE_CHOICES = [
-        (PRESEASON, "Preseason"),
-        (REGULAR_SEASON, "Regular Season"),
-        (PLAYOFFS, "Playoffs")
-    ]
-
-    game_type = models.IntegerField(choices=GAME_TYPE_CHOICES, null=True)
-
-    # goals
-    home_team_goals = models.IntegerField(default=0)
-    away_team_goals = models.IntegerField(default=0)
-
-    # shootout and overtime finishes
-    is_overtime = models.BooleanField(default=False)
-    is_shootout = models.BooleanField(default=False)
 
     # relationships to TeamData for pre-game analysis
     home_team_data = models.ForeignKey(TeamData, on_delete=models.CASCADE, related_name='home_game_data', null=True)

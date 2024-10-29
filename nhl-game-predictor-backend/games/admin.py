@@ -25,8 +25,8 @@ class TeamDataAdmin(admin.ModelAdmin):
 # Game Admin configuration
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('home_team', 'away_team', 'game_date', 'game_type', 'home_team_goals', 'away_team_goals', 'is_completed')
-    list_filter = ('game_type', 'game_date', 'home_team', 'away_team')
+    list_display = ('home_team', 'away_team', 'game_date')
+    list_filter = ('game_date', 'home_team', 'away_team')
     search_fields = ('home_team__name', 'away_team__name')
     date_hierarchy = 'game_date'
 
