@@ -1,8 +1,13 @@
 import os
 import django
 import pandas as pd
-from games.models import Team, TeamData, Game
+from games.models import Game
 from datetime import datetime
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -180,3 +185,28 @@ def create_data_frame(past_seasons):
     game_data_df = pd.DataFrame(game_data_dicts)
 
     return game_data_df
+
+def train_random_forest(past_seasons):
+    game_data_df = create_data_frame(past_seasons=past_seasons)
+
+    # split features and labels from dataframe
+    features = game_data_df.drop(columns=['home_team_win'])
+    labels = game_data_df['home_team_win']
+
+    # split of training and validation data
+    training_features, testing_features, training_labels, testing_labels = train_test_split(features, 
+                                                                                            labels, 
+                                                                                            test_size=0.2, 
+                                                                                            random_state=31)
+
+    # create random_forest (may have to test these parameters)
+    random_forest = RandomForestClassifier(n_estimators=250, random_state=31, max_depth=15)
+
+    # fit and predict
+    random_forest.fit(training_features, training_labels)
+
+    predicted_labels = random_forest.predict(testing_features)
+
+    # Evaluate the model
+    accuracy = accuracy_score(testing_labels, predicted_labels)
+    print("accuracy:", accuracy)
