@@ -184,7 +184,7 @@ def load_team_data_for_date_from_api(team_abbreviation, game_date):
             return TeamData.objects.filter(team=team, data_capture_date=previous_day).first()
 
 @transaction.atomic
-def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
+def load_games_for_team_from_api(team_abbreviation, seasons):
     """
     given the abbreviation of a team, load Game and GameData model instances
     into the db. 
@@ -203,28 +203,9 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
     if team is None:
         raise ValueError(f"No team found with abbreviation {team_abbreviation}")
     
-    if past_seasons < 0:
-        raise ValueError(f"Enter a positive past_seasons for {team_abbreviation}")
+    if len(seasons) == 0:
+        raise ValueError(f"Please enter seasons to fetch game data for.")
     
-    def create_seasons_strings(past_seasons):
-        """
-        builds a list of season strings as required by the NHL API
-        """
-        # create current season and add to list
-        current_year = datetime.now().year
-        current_season = f"{current_year}{current_year + 1}"
-
-        # build list of current season and past seasons
-        seasons = [current_season]
-        for i in range(1, past_seasons + 1):
-            past_year = current_year - i
-            past_season = f"{past_year}{past_year + 1}"
-            seasons.append(past_season)
-        
-        return seasons
-    
-    # get seasons
-    seasons = create_seasons_strings(past_seasons=past_seasons)
     games_to_create = []
     games_to_update = []
 
@@ -313,12 +294,12 @@ def load_games_for_team_from_api(team_abbreviation, past_seasons=0):
     ])
 
 @transaction.atomic
-def load_games_for_all_teams_from_api(past_seasons=0):
+def load_games_for_all_teams_from_api(seasons):
     teams = Team.objects.all()
 
     for team in teams:
         load_games_for_team_from_api(team_abbreviation=team.abbreviation,
-                                     past_seasons=past_seasons)
+                                     seasons=seasons)
     
 @transaction.atomic
 def clear_database():
