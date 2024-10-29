@@ -80,3 +80,19 @@ class Game(models.Model):
     def is_completed(self):
         current_date = datetime.now().date()
         return current_date > self.game_date
+    
+
+class GamePrediction(models.Model):
+    """
+    class to represent a Game Prediction/Choice of the machine learning model. used for caching purposes
+    once the machine learning model has made predictions for all games on a provided day
+    """
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='prediction', null=True, blank=True)
+    predicted_home_team_win = models.BooleanField(default=False)
+    confidence_score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    # stores the top feature names and their importance for the prediction. Will likely just end up displaying the top 3-5 factors
+    top_features = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Prediction for Game {self.game} - Predicted Winner: {self.predicted_winner}"
