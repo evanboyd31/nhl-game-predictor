@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from .models import Game, GamePrediction
@@ -27,6 +28,21 @@ class GameListByDateView(generics.ListAPIView):
             return Game.objects.filter(game_date=date)
         except ValueError:
             raise NotFound("Invalid date format. Use 'YYYY-MM-DD'.")
+        
+
+class GamePredictionByGameIdView(APIView):
+    """
+    Get a game prediction for a provided Game's id. When only 1 PredictionModel is in use,
+    any Game associated to a GamePrediction will be associated to exactly 1 GamePrediction
+    """
+    def get(self, request, game_id, *args, **kwargs):
+        try:
+            prediction = GamePrediction.objects.get(game__id=game_id)
+        except GamePrediction.DoesNotExist:
+            raise NotFound(f"Prediction for the specified game ID {game_id} does not exist.")
+        
+        serializer = GamePredictionSerializer(prediction)
+        return Response(serializer.data)
 
 class GamePredictionListByDateView(generics.ListAPIView):
     serializer_class = GamePredictionSerializer
