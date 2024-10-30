@@ -35,10 +35,9 @@ def generate_past_season_ids(past_seasons):
     
     return season_ids
 
-def create_data_frame(past_seasons):
-    seasons = generate_past_season_ids(past_seasons)
+def create_seasons_dataframe(past_seasons):
     # Fetch all Game records for the specified past seasons
-    games = Game.objects.filter(game_json__season__in=seasons).exclude(home_team_data=None, away_team_data=None)
+    games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
 
     # Create GameDataFrameEntry instances for each game
     game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
@@ -51,19 +50,22 @@ def create_data_frame(past_seasons):
 
     return game_data_df
 
-@transaction.atomic
-def train_random_forest(past_seasons):
-    game_data_df = create_data_frame(past_seasons=past_seasons)
-
+def create_training_data(game_data_df):
     # split features and labels from dataframe
     features = game_data_df.drop(columns=['home_team_win'])
     labels = game_data_df['home_team_win']
 
     # split of training and validation data
-    training_features, testing_features, training_labels, testing_labels = train_test_split(features, 
-                                                                                            labels, 
-                                                                                            test_size=0.2, 
-                                                                                            random_state=31)
+    return train_test_split(features, 
+                            labels, 
+                            test_size=0.2, 
+                            random_state=31)
+
+@transaction.atomic
+def train_random_forest(past_seasons):
+    game_data_df = create_seasons_dataframe(past_seasons=past_seasons)
+
+    training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
 
     # create random_forest (may have to test these parameters)
     random_forest = RandomForestClassifier(n_estimators=250, random_state=31, max_depth=15)
