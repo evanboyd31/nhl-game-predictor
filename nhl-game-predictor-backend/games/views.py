@@ -5,6 +5,14 @@ from .models import Game, GamePrediction
 from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 
+class GameDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve a Game by its ID.
+    """
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    lookup_field = 'id'
+
 class GameListByDateView(generics.ListAPIView):
     serializer_class = GameSerializer
 
