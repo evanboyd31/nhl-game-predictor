@@ -8,12 +8,8 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \      # Install the GCC compiler and other essential tools
-    libpq-dev \            # Install the PostgreSQL development files
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (no need for libpq-dev anymore)
+RUN apt-get update && apt-get install -y build-essential && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the poetry.lock and pyproject.toml files to the working directory
 COPY pyproject.toml poetry.lock ./
