@@ -18,6 +18,7 @@ pandas = "^2.2.3"
 djangorestframework = "^3.15.2"
 lime = "^0.2.0.1"
 gunicorn = "^23.0.0"
+whitenoise = "^6.8.2"
 
 
 [build-system]
