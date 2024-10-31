@@ -5,7 +5,7 @@ from rest_framework.exceptions import NotFound
 from .models import Game, GamePrediction
 from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
-from predictor.ml_models.predict_model import predict_games_today
+from predictor.ml_models.predict_model import predict_games
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -86,6 +86,6 @@ class PredictGamesTodayView(APIView):
             return Response(serializer.data)
         
         # otherwise, predictions haven't been made yet for the games today, 
-        todays_predictions = predict_games_today(games_today)
+        todays_predictions = predict_games(games_today)
         serializer = GamePredictionSerializer(todays_predictions, many=True)
         return Response(serializer.data)
