@@ -5,6 +5,7 @@ from rest_framework.exceptions import NotFound
 from .models import Game, GamePrediction
 from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
+from predictor.ml_models.predict_model import predict_games_today
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -65,4 +66,26 @@ class GamePredictionListByDateView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+class PredictGamesTodayView(APIView):
+    """
+    API endpoint that is called every night at midnight to generate today's game predicitions
+    since you can't make chron jobs on render unless you pay :(
+    """
+    
+    def get(self, request):
+        today = timezone.now().date()
+        games_today = Game.objects.filter(game_date=today)
+
+        # check to see if we've already made predictions for today
+        # if we have, then we return them all
+        if all(GamePrediction.objects.filter(game=game).exists() for game in games_today):
+            todays_predictions = GamePrediction.objects.filter(game__in=games_today)
+            serializer = GamePredictionSerializer(todays_predictions, many=True)
+            return Response(serializer.data)
+        
+        # otherwise, predictions haven't been made yet for the games today, 
+        todays_predictions = predict_games_today(games_today)
+        serializer = GamePredictionSerializer(todays_predictions, many=True)
         return Response(serializer.data)
