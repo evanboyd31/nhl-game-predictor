@@ -75,8 +75,11 @@ class PredictGamesTodayView(APIView):
     """
     
     def get(self, request):
-        today = timezone.now().date()
+        today = timezone.localdate()
         games_today = Game.objects.filter(game_date=today)
+
+        print(f"Today's date: {today}")
+        print(f"Games today: {games_today}")
 
         # check to see if we've already made predictions for today
         # if we have, then we return them all

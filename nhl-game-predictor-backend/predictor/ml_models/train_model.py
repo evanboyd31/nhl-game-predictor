@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Max
 from predictor.models import PredictionModel
 from games.models import Game
-from datetime import datetime
+from django.utils import timezone
 import pickle
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -17,7 +17,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
 def generate_past_season_ids(past_seasons):
-    current_date = datetime.now()
+    current_date = timezone.localdate()
     current_month = current_date.month
     current_year = current_date.year
     
