@@ -10,7 +10,8 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
+    build-essential \      # Install the GCC compiler and other essential tools
+    libpq-dev \            # Install the PostgreSQL development files
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
