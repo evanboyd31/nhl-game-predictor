@@ -4,11 +4,12 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies (no need for libpq-dev anymore)
+# Install system dependencies
 RUN apt-get update && apt-get install -y build-essential && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the poetry.lock and pyproject.toml files to the working directory
@@ -23,8 +24,8 @@ RUN poetry install --no-root
 # Copy the rest of your application code into the container
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Collect static files using Poetry's run command
+RUN poetry run python manage.py collectstatic --noinput
 
 # Start the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
