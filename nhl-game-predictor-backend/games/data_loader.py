@@ -7,7 +7,8 @@ django.setup()
 
 from django.conf import settings
 from games.models import Franchise, Team, Game, TeamData
-from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timedelta, datetime
 from django.db import transaction
 
 # mapping from API-provided strings to integer values for GameData model class
@@ -51,7 +52,7 @@ def load_active_team_logo_urls():
     into a Team model class and store in the db
     """
     # create current date string for standings_url
-    current_date = datetime.now()
+    current_date = timezone.localdate()
     formatted_date = current_date.strftime("%Y-%m-%d")
 
     # first get a list of teams from the standings to get all team abbreviations
@@ -91,7 +92,7 @@ def load_team_data_for_date_from_api(team : Team, game_date):
     # check to see if we already have the data for the given team and date
     previous_team_data = TeamData.objects.filter(team=team, data_capture_date=previous_day).first()
     if previous_team_data is not None:
-        return None
+        return previous_team_data
 
 
     # format the standings URL for the given date
@@ -138,7 +139,7 @@ def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True)
     existing_team_data_keys = set()
 
     # used to see the completion status of a game
-    current_date = datetime.now().date()
+    current_date = timezone.localdate()
 
     for season in seasons:
         # get schedule and all games for this season
@@ -189,14 +190,14 @@ def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True)
                 games_to_create.append(game)
 
                 # check if home team data already exists in list
-                if home_team_data is not None:
+                if home_team_data is not None and home_team_data.pk is not None:
                     team_data_key = (home_team.id, home_team_data.data_capture_date)
                     if team_data_key not in existing_team_data_keys:
                         existing_team_data_keys.add(team_data_key)
                         team_data_to_create.append(home_team_data)
 
                 # check if away team data already exists in list
-                if away_team_data is not None:
+                if away_team_data is not None and away_team_data.pk is not None:
                     team_data_key = (away_team.id, away_team_data.data_capture_date)
                     if team_data_key not in existing_team_data_keys:
                         existing_team_data_keys.add(team_data_key)

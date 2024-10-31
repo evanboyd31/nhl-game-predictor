@@ -1,10 +1,19 @@
+import os
+import django 
+import re
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
+django.setup()
+
 import pickle
 import pandas as pd
-from games.models import Game, GamePrediction
+
+from django.db import transaction
+from games.models import Game, GamePrediction, TeamData
 from predictor.ml_models.utils import GameDataFrameEntry
 from predictor.models import PredictionModel
 from predictor.ml_models.train_model import create_seasons_dataframe, create_training_data
 from lime.lime_tabular import LimeTabularExplainer
+from games.data_loader import load_team_data_for_date_from_api
 
 def load_random_forest_model():
     """
@@ -26,13 +35,10 @@ def load_random_forest_model():
     
     return model
 
-def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, model):
+def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, model, training_features):
     """
     Get the top n features driving the prediction confidence for a specific game.
     """
-
-    # get the data that was used to train the model (will need to update this in the PredictionModel class)
-    training_features, _, _, _= create_training_data(create_seasons_dataframe([20222023,20232024]))
 
     # use lime explainer. class_names is the label we're trying to predict
     explainer = LimeTabularExplainer(
@@ -50,28 +56,29 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
     exp = explainer.explain_instance(instance, model.predict_proba)
 
     # get the top 5 features, their importance, and then clean the importances so feature values can be found
-    top_features = exp.as_list()[:5]  # Get top 5 features
+    top_features = exp.as_list()[:5] 
     top_features_df = pd.DataFrame(top_features, columns=['Feature', 'Importance'])
-
-
-    top_features_df['Cleaned Feature'] = top_features_df['Feature'].apply(lambda feature: feature.split()[0])
-
-    # get only the cleaned feature names and find corresponding feature values from game_data_frame_entry
-    cleaned_features = top_features_df['Cleaned Feature'].tolist()
+    
     game_feature_values = game_data_frame_entry.to_dict()
-    top_features_dictionary = {}
-    for cleaned_feature in cleaned_features:
-        top_features_dictionary[cleaned_feature] = game_feature_values[cleaned_feature]
+
+    cleaned_features = []
+
+    for top_feature in top_features:
+        tokens = top_feature[0].split(" ")
+        for token in tokens:
+            if token in game_feature_values:
+                cleaned_features.append(token)
+                break
+
+    top_features_dictionary = {cleaned_feature : game_feature_values[cleaned_feature] for cleaned_feature in cleaned_features}
 
     return top_features_dictionary
 
-def predict_game_outcome(game):
+def predict_game_outcome(game, model, training_features):
     """
     predict the outcome of a game using the latest Random Forest model.
     """
-    # Load the latest model
-    model = load_random_forest_model()
-
+   
     # prepare game data for dataframe and prediction
     game_data_frame_entry = GameDataFrameEntry(game)
     game_data_df = pd.DataFrame([game_data_frame_entry.to_dict()])
@@ -88,8 +95,8 @@ def predict_game_outcome(game):
 
     top_features = get_top_features(game_data_frame_entry=game_data_frame_entry,
                                     game_data_df=game_data_df,
-                                    model=model)
-
+                                    model=model,
+                                    training_features=training_features)
 
     # get the latest model instance for saving prediction
     prediction_model = PredictionModel.objects.order_by('-version').first()
@@ -107,3 +114,44 @@ def predict_game_outcome(game):
     )
 
     return game_prediction
+
+@transaction.atomic
+def predict_games(games):
+    """
+    function to create GamePredictions for all games on the current date
+    """
+
+    # Load the latest model
+    model = load_random_forest_model()
+
+    # get training features
+    # get the data that was used to train the model (will need to update this in the PredictionModel class)
+    training_features, _, _, _= create_training_data(create_seasons_dataframe([20222023,20232024]))
+
+    predictions = []
+    team_data = []
+    games_data = []
+    for game in games:
+        home_team_data = load_team_data_for_date_from_api(game.home_team, game.game_date)
+        away_team_data = load_team_data_for_date_from_api(game.away_team, game.game_date)
+        game.home_team_data = home_team_data
+        game.away_team_data = away_team_data
+
+        team_data.append(home_team_data)
+        team_data.append(away_team_data)
+        games_data.append(game)
+
+        game_prediction = predict_game_outcome(game=game,
+                                               model=model,
+                                               training_features=training_features)
+        predictions.append(game_prediction)
+
+    if team_data:
+        TeamData.objects.bulk_create(team_data)
+    
+    if games_data:
+        Game.objects.bulk_update(games_data, 
+                                 fields=["home_team_data", "away_team_data"])
+    
+    return predictions
+

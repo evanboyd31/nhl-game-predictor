@@ -1,47 +1,41 @@
 from rest_framework import serializers
 from .models import Franchise, Team, TeamData, Game, GamePrediction
 
+from rest_framework import serializers
+from .models import Game, Team, GamePrediction
+from predictor.serializers import PredictionModelSerializer
+
 class FranchiseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Franchise
-        fields = ['franchise_id']
-
+        fields = '__all__'
 
 class TeamSerializer(serializers.ModelSerializer):
+    franchise = FranchiseSerializer(serializers.ModelSerializer)
     class Meta:
         model = Team
-        fields = ['id', 'franchise', 'name', 'abbreviation', 'logo_url']
-
+        fields = '__all__'
 
 class TeamDataSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
+
     class Meta:
         model = TeamData
-        fields = ['id', 'team', 'team_data_json', 'data_capture_date']
-
+        fields = '__all__'
 
 class GameSerializer(serializers.ModelSerializer):
+    home_team = TeamSerializer() 
+    away_team = TeamSerializer()
+
     class Meta:
         model = Game
-        fields = [
-            'id',
-            'game_json',
-            'home_team',
-            'away_team',
-            'winning_team',
-            'game_date',
-            'home_team_data',
-            'away_team_data'
-        ]
+        fields = '__all__'
 
 
 class GamePredictionSerializer(serializers.ModelSerializer):
+    game = GameSerializer()
+    model = PredictionModelSerializer()
+
     class Meta:
         model = GamePrediction
-        fields = [
-            'id',
-            'game',
-            'model',
-            'predicted_home_team_win',
-            'confidence_score',
-            'top_features'
-        ]
+        fields = '__all__'

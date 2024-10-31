@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 
 class Franchise(models.Model):
@@ -78,7 +78,7 @@ class Game(models.Model):
         return f"{self.home_team} vs {self.away_team} on {self.game_date.strftime('%Y-%m-%d %H:%M')}"
     
     def is_completed(self):
-        current_date = datetime.now().date()
+        current_date = timezone.localdate()
         return current_date > self.game_date
     
 
