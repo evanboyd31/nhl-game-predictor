@@ -28,8 +28,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "default_security_key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://nhl-game-predictor.onrender.com']
+ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 'nhl-game-predictor-backend.onrender.com', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://nhl-game-predictor-backend.onrender.com', 'https://nhl-game-predictor.onrender.com']
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
