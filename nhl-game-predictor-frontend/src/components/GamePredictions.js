@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/game-predictions.css";
 import GamePrediction from "./GamePrediction";
+import gamePredictions from "./TestData";
 
 const formatDate = (date) => {
   const options = { month: "long", day: "numeric", year: "numeric" };
@@ -18,7 +19,9 @@ const GamePredictions = () => {
         Predictions for games on {formatDate(new Date())}
       </h3>
       <ul className="game-predictions-list">
-        <GamePrediction />
+        {gamePredictions.map((gamePrediction) => (
+          <GamePrediction gamePrediction={gamePrediction} />
+        ))}
       </ul>
     </div>
   );
