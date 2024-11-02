@@ -55,8 +55,8 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
     # Explain the prediction
     exp = explainer.explain_instance(instance, model.predict_proba)
 
-    # get the top 5 features, their importance, and then clean the importances so feature values can be found
-    top_features = exp.as_list()[:5] 
+    # convert features into a list, and get their importance, and then clean the importances so feature values can be found
+    top_features = exp.as_list() 
     top_features_df = pd.DataFrame(top_features, columns=['Feature', 'Importance'])
     
     game_feature_values = game_data_frame_entry.to_dict()
@@ -65,12 +65,20 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
 
     for top_feature in top_features:
         tokens = top_feature[0].split(" ")
+        importance_value = top_feature[1]
         for token in tokens:
+            # only add if feature is not meaningless to the user
             if token in game_feature_values:
-                cleaned_features.append(token)
+                cleaned_features.append([token, importance_value])
                 break
 
-    top_features_dictionary = {cleaned_feature : game_feature_values[cleaned_feature] for cleaned_feature in cleaned_features}
+        # exit if we have found 5 meaningful features
+        if len(cleaned_features) == 5:
+            break
+
+    top_features_dictionary = {cleaned_feature[0] : [game_feature_values[cleaned_feature[0]], cleaned_feature[1]] for cleaned_feature in cleaned_features}
+
+    print(top_features_dictionary)
 
     return top_features_dictionary
 
@@ -146,12 +154,12 @@ def predict_games(games):
                                                training_features=training_features)
         predictions.append(game_prediction)
 
-    if team_data:
-        TeamData.objects.bulk_create(team_data)
+    # if team_data:
+    #     TeamData.objects.bulk_create(team_data)
     
-    if games_data:
-        Game.objects.bulk_update(games_data, 
-                                 fields=["home_team_data", "away_team_data"])
+    # if games_data:
+    #     Game.objects.bulk_update(games_data, 
+    #                              fields=["home_team_data", "away_team_data"])
     
     return predictions
 

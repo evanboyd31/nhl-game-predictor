@@ -43,10 +43,15 @@ class GamePredictionAdmin(admin.ModelAdmin):
     search_fields = ('game__home_team__name', 'game__away_team__name')
 
     def display_top_features(self, obj):
-        """Display top 5 features and their importance scores."""
+        """Display top features and their importance scores."""
         if obj.top_features:
-            top_features = sorted(obj.top_features.items(), key=lambda x: x[1], reverse=True)[:5]
-            return ", ".join([f"{k}: {v:.2f}" for k, v in top_features])
+            # Ensure to only sort valid entries
+            top_features = sorted(
+                ((k, v) for k, v in obj.top_features.items() if isinstance(v, list) and len(v) == 2),
+                key=lambda x: x[1][1],  # Accessing the importance
+                reverse=True
+            )[:5]
+            return ", ".join([f"{k}: {v[0]} (Importance: {v[1]:.2f})" for k, v in top_features])
         return "No features"
 
     display_top_features.short_description = "Top Features (5)"
