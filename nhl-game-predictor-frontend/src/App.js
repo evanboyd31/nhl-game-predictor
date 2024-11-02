@@ -1,7 +1,12 @@
 import "./index.css";
+import Header from "./components/Header.js";
 
 function App() {
-  return <div>Hello game predictor</div>;
+  return (
+    <div>
+      <Header />
+    </div>
+  );
 }
 
 export default App;
