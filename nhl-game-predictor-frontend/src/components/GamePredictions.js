@@ -20,7 +20,10 @@ const GamePredictions = () => {
       </h3>
       <ul className="game-predictions-list">
         {gamePredictions.map((gamePrediction) => (
-          <GamePrediction gamePrediction={gamePrediction} />
+          <GamePrediction
+            gamePrediction={gamePrediction}
+            key={gamePrediction.id}
+          />
         ))}
       </ul>
     </div>

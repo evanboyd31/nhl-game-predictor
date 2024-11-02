@@ -19,28 +19,47 @@
 }
 
 .item {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
   padding: 20px 24px;
-  /* padding-right: 48px; */
   cursor: pointer;
   border-top: 4px solid #fff;
   border-bottom: 4px solid #fff;
 
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  column-gap: 24px;
-  row-gap: 32px;
-  align-items: center;
+  /* Removed grid layout to prevent misalignment */
+  display: flex; /* Use flex to stack elements */
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items */
   margin-bottom: 50px;
+  width: 90%;
+  max-width: 600px;
+  border: 2px solid #ee983a;
+  border-radius: 10px;
+  padding-top: 0px;
 }
 
 /* for when game prediction items have been opened */
-.open {
+/* .open {
   border-top: 2px solid #ee983a;
   border-bottom: 2px solid #ffffff;
-}
+} */
 
 .open .number,
 .open .text {
   color: #ee983a;
+}
+
+.team-logos {
+  display: flex;
+  justify-content: center; /* Center the logos horizontally */
+  align-items: center;
+  margin-top: 0px;
+  gap: 20px; /* Optional: Space between logos */
+}
+
+.team-logo {
+  width: 150px; /* Adjust as needed */
+  height: auto;
 }
