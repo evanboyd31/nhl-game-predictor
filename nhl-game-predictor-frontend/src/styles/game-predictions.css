@@ -1,6 +1,7 @@
 .game-predictions > * {
   color: #ffffff;
   display: flex;
+  justify-content: center;
   flex-direction: column;
   align-items: center;
 }
@@ -9,4 +10,36 @@
   font-size: 1.8rem;
   font-weight: 600;
   letter-spacing: 1px;
+}
+
+.game-predictions-list {
+  padding-inline-start: 0; /* Removes default left padding */
+  margin: 0; /* Optionally reset margin as well */
+  list-style-type: none; /* Removes bullet points */
+}
+
+.item {
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  padding: 20px 24px;
+  /* padding-right: 48px; */
+  cursor: pointer;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 24px;
+  row-gap: 32px;
+  align-items: center;
+}
+
+/* for when game prediction items have been opened */
+.open {
+  border-top: 2px solid #ee983a;
+  border-bottom: 2px solid #ffffff;
+}
+
+.open .number,
+.open .text {
+  color: #ee983a;
 }

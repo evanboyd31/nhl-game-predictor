@@ -12,6 +12,7 @@ body,
 }
 
 .page-body {
+  font-family: "Poppins", sans-serif;
   background-color: #0d1117;
   padding: 20px;
   color: #0a1c2b;
