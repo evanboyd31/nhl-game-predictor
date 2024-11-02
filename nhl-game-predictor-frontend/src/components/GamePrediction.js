@@ -1,8 +1,9 @@
 import React from "react";
 
-const GamePrediction = ({ gamePrediction }) => {
+const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
   // extract relevant game info from Game, Team, GamePrediction objects
   const game = gamePrediction.game;
+  const gamePredictionId = gamePrediction.id;
   const gameJson = game.game_json;
 
   // home team info
@@ -16,7 +17,10 @@ const GamePrediction = ({ gamePrediction }) => {
   const awayTeamDarkLogoURL = gameJson.awayTeam.darkLogo;
 
   return (
-    <li className="item open">
+    <li
+      className={`item ${isOpen.isOpen ? "open" : ""}`}
+      onClick={() => onGamePredictionClick(gamePredictionId)}
+    >
       <h3 className="text">
         <span>{awayTeamAbbreviation}</span> at{" "}
         <span>{homeTeamAbbreviation}</span>

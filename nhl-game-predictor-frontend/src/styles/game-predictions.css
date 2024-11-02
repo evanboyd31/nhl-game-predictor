@@ -19,6 +19,7 @@
 }
 
 .item {
+  color: #ffffff;
   font-size: 1.8rem;
   font-weight: 600;
   letter-spacing: 1px;
@@ -47,7 +48,7 @@
 } */
 
 .open .number,
-.open .text {
+.open h3 {
   color: #ee983a;
 }
 

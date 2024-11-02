@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import "../styles/game-predictions.css";
 import GamePrediction from "./GamePrediction";
 import gamePredictions from "./TestData";
@@ -13,18 +14,42 @@ const formatDate = (date) => {
 };
 
 const GamePredictions = () => {
+  const [isOpen, setIsOpen] = useState(
+    gamePredictions.map((gamePrediction) => ({
+      id: gamePrediction.id,
+      isOpen: false,
+    }))
+  );
+
+  const handleGamePredictionClick = (gamePredictionId) => {
+    setIsOpen(
+      isOpen.map((gamePrediction) =>
+        gamePredictionId === gamePrediction.id
+          ? { ...gamePrediction, isOpen: !gamePrediction.isOpen }
+          : { ...gamePrediction, isOpen: false }
+      )
+    );
+  };
+
   return (
     <div className="game-predictions">
       <h3 className="game-predictions-header">
         Predictions for games on {formatDate(new Date())}
       </h3>
       <ul className="game-predictions-list">
-        {gamePredictions.map((gamePrediction) => (
-          <GamePrediction
-            gamePrediction={gamePrediction}
-            key={gamePrediction.id}
-          />
-        ))}
+        {gamePredictions.map((gamePrediction) => {
+          const isOpenPrediction = isOpen.find(
+            (item) => item.id === gamePrediction.id
+          );
+          return (
+            <GamePrediction
+              gamePrediction={gamePrediction}
+              key={gamePrediction.id}
+              isOpen={isOpenPrediction}
+              onGamePredictionClick={handleGamePredictionClick}
+            />
+          );
+        })}
       </ul>
     </div>
   );
