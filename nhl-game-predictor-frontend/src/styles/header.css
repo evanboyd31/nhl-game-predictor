@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a1c2b;
+  padding: 20px;
+  color: #ffffff;
+}
+
+.nhl-logo {
+  width: 75px;
+  height: 75px;
+  height: auto;
+  margin-right: 15px;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.header-emoji {
+  font-size: 1.5rem;
+  margin-left: 10px;
+}
