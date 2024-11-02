@@ -10,7 +10,8 @@ const Header = () => {
         <img src={nhlLogo} alt="NHL Logo" className="nhl-logo" />
       </a>
       <h1 className="header-title">
-        NHL Game Predictions <span className="header-emoji">🏒🥅</span>
+        Predictions
+        <span className="header-emoji">🏒</span>
       </h1>
     </header>
   );
