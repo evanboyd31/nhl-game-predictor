@@ -1,4 +1,5 @@
 import React from "react";
+import GamePredictionStats from "./GamePredictionStats";
 
 const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
   // extract relevant game info from Game, Team, GamePrediction objects
@@ -38,6 +39,8 @@ const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
           className="team-logo home-team-logo"
         />
       </div>
+
+      {isOpen.isOpen && <GamePredictionStats gamePrediction={gamePrediction} />}
     </li>
   );
 };
