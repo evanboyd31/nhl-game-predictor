@@ -32,8 +32,22 @@ USE_TZ = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 'nhl-game-predictor-backend.onrender.com', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://nhl-game-predictor-backend.onrender.com', 'https://nhl-game-predictor.onrender.com']
+ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 
+                 'nhl-game-predictor-backend.onrender.com', 
+                 'localhost', 
+                 '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://nhl-game-predictor-backend.onrender.com', 
+                        'https://nhl-game-predictor.onrender.com',
+                        'https://localhost:3000',
+                        'http://127.0.0.1:3000',
+                        'http://localhost:3000']
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000", 
+
+]
+
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
@@ -48,10 +62,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'games',
     'predictor',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
