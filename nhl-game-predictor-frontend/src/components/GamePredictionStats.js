@@ -8,12 +8,17 @@ const GamePredictionStats = ({ gamePrediction, isOpen }) => {
       : gamePrediction.game.away_team.name
   }`;
 
+  const teamName = winnerString.split(" ").slice(1).join(" ");
+  console.log(teamName);
+
   const topFeatures = gamePrediction.top_features;
   return isOpen.isOpen ? (
     <div className="game-prediction-stats">
       <span className="game-prediction-stats-header">
         <span className="green-text">Predicted winner:</span>{" "}
-        <span>{winnerString}. Here's why...</span>
+        <span>
+          {teamName}. <br /> Here's why...
+        </span>
       </span>
       <GamePredictionBarChart
         gamePrediction={gamePrediction}

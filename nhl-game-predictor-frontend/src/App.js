@@ -4,6 +4,11 @@ import GamePredictions from "./components/GamePredictions.js";
 import { useState, useEffect } from "react";
 
 const App = () => {
+  // set page title
+  useEffect(() => {
+    document.title = "NHL Game Predictions";
+  }, []);
+
   console.log(process.env.REACT_APP_BASE_API_URL);
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
