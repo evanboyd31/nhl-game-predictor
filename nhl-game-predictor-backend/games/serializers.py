@@ -56,6 +56,7 @@ class GamePredictionSerializer(serializers.ModelSerializer):
     class Meta:
         model = GamePrediction
         fields = [
+            'id',
             'game', 
             'model', 
             'predicted_home_team_win', 
