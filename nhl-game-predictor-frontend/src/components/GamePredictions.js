@@ -2,9 +2,8 @@ import React from "react";
 import { useState } from "react";
 import "../styles/game-predictions.css";
 import GamePrediction from "./GamePrediction";
-import gamePredictions from "./TestData";
 
-const GamePredictions = () => {
+const GamePredictions = ({ gamePredictions }) => {
   const today = new Date();
   const [isOpen, setIsOpen] = useState(
     gamePredictions.map((gamePrediction) => ({
