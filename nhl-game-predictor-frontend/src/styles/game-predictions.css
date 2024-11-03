@@ -1,0 +1,114 @@
+.orange-text {
+  color: #ee983a;
+}
+
+.green-text {
+  color: #328e44;
+}
+
+.game-predictions > * {
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-predictions-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.game-predictions-list {
+  padding-inline-start: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.team-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0px;
+  gap: 20px;
+}
+
+.team-logo {
+  width: 150px;
+  height: auto;
+}
+
+.game-prediction-stats {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.game-prediction-stats-header {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.open .game-prediction-stats {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.item {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  padding: 20px 24px;
+  cursor: pointer;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+  width: 90%;
+  max-width: 600px;
+  border: 2px solid #ee983a;
+  border-radius: 10px;
+  padding-top: 0px;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: hidden;
+}
+
+.open {
+  flex-direction: column;
+  align-items: center;
+}
+
+.open .game-prediction-stats {
+  max-height: none;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.game-prediction-stats {
+  width: 100%;
+  padding: 10px;
+}
+
+.descriptions > * {
+  font-size: 1rem !important;
+  font-weight: 100;
+}
+
+.open .game-prediction-header {
+  justify-content: center;
+  color: #ee983a;
+}
+
+.legend {
+  font-size: 1rem !important;
+  font-weight: 100;
+}
