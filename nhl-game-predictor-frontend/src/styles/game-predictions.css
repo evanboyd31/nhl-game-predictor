@@ -21,9 +21,38 @@
 }
 
 .game-predictions-list {
-  padding-inline-start: 0; /* Removes default left padding */
-  margin: 0; /* Optionally reset margin as well */
-  list-style-type: none; /* Removes bullet points */
+  padding-inline-start: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.team-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0px;
+  gap: 20px;
+}
+
+.team-logo {
+  width: 150px;
+  height: auto;
+}
+
+.game-prediction-stats {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.game-prediction-stats-header {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.open .game-prediction-stats {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .item {
@@ -37,49 +66,49 @@
   border-top: 4px solid #fff;
   border-bottom: 4px solid #fff;
 
-  /* Removed grid layout to prevent misalignment */
-  display: flex; /* Use flex to stack elements */
-  flex-direction: column; /* Stack items vertically */
-  align-items: center; /* Center items */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 50px;
   width: 90%;
   max-width: 600px;
   border: 2px solid #ee983a;
   border-radius: 10px;
   padding-top: 0px;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: hidden;
 }
 
-/* for when game prediction items have been opened */
-/* .open {
-  border-top: 2px solid #ee983a;
-  border-bottom: 2px solid #ffffff;
-} */
-
-.open .number,
-.open h3 {
-  color: #ee983a;
-}
-
-.team-logos {
-  display: flex;
-  justify-content: center; /* Center the logos horizontally */
+.open {
+  flex-direction: column;
   align-items: center;
-  margin-top: 0px;
-  gap: 20px; /* Optional: Space between logos */
 }
 
-.team-logo {
-  width: 150px; /* Adjust as needed */
-  height: auto;
+.open .game-prediction-stats {
+  max-height: none;
+  overflow-y: auto;
+  width: 100%;
 }
 
 .game-prediction-stats {
-  border-top: 1px solid #ccc; /* Light gray line */
-  padding-top: 10px; /* Optional: space between the line and content */
-  margin-top: 10px; /* Optional: space above the line */
+  width: 100%;
+  padding: 10px;
 }
 
-.game-prediction-stats-header {
-  font-size: 1rem;
-  font-weight: 600;
+.descriptions > * {
+  font-size: 1rem !important;
+  font-weight: 100;
+}
+
+.open .game-prediction-header {
+  justify-content: center;
+  color: #ee983a;
+}
+
+.legend {
+  font-size: 1rem !important;
+  font-weight: 100;
 }
