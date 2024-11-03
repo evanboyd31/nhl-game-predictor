@@ -154,12 +154,12 @@ def predict_games(games):
                                                training_features=training_features)
         predictions.append(game_prediction)
 
-    # if team_data:
-    #     TeamData.objects.bulk_create(team_data)
+    if team_data:
+        TeamData.objects.bulk_create(team_data)
     
-    # if games_data:
-    #     Game.objects.bulk_update(games_data, 
-    #                              fields=["home_team_data", "away_team_data"])
+    if games_data:
+        Game.objects.bulk_update(games_data, 
+                                 fields=["home_team_data", "away_team_data"])
     
     return predictions
 
