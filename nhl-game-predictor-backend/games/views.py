@@ -1,12 +1,13 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ParseError
 from .models import Game, GamePrediction
 from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
+from .permissions import PredictGamesTodayPermission
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -49,24 +50,49 @@ class GamePredictionByGameIdView(APIView):
 class GamePredictionListByDateView(generics.ListAPIView):
     serializer_class = GamePredictionSerializer
 
-    def get_queryset(self):
-
+    def get_date(self):
         date_str = self.request.query_params.get('date')
-        
         # caller must provide a date to find game predictions
         if not date_str:
-            raise NotFound("A date must be provided in the format 'YYYY-MM-DD'.")
-
+            raise ParseError("A date must be provided in the format 'YYYY-MM-DD'.")
         # ensure date is in correct format
         try:
             date = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
-            return GamePrediction.objects.filter(game__game_date=date)
+            return date
         except ValueError:
-            raise NotFound("Invalid date format. Use 'YYYY-MM-DD'.")
+            raise ParseError("Invalid date format. Use 'YYYY-MM-DD'.")
+
+    def get_predictions(self):
+        """
+        function to get the game predictions on the specified date
+        """
+        date = self.get_date()
+        predictions = GamePrediction.objects.filter(game__game_date=date)
+        return predictions
+
+    def get_games(self):
+        """
+        function to get the games on the specified date. useful for checking
+        if predictions have been made yet, or if there are any games scheduled today
+        """
+        date = self.get_date()
+        games = Game.objects.filter(game_date=date)
+        return games
 
     def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        # get GamePredictions and Games for specified date
+        predictions = self.get_predictions()
+        games = self.get_games()
+
+        # there are no games scheduled on the date, so raise an error saying so
+        if games.count() == 0:
+            raise NotFound("There are no NHL games scheduled today.")
+
+        # there are games scheduled today, but the corresponding GamePredictions have not yet been made
+        if games.count() != predictions.count():
+            raise NotFound("Our predictions have not yet been created for the NHL games scheduled today. Check back soon!")
+
+        serializer = self.get_serializer(predictions, many=True)
         return Response(serializer.data)
     
 class PredictGamesTodayView(APIView):
@@ -75,7 +101,7 @@ class PredictGamesTodayView(APIView):
     since you can't make chron jobs on render unless you pay :(
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [PredictGamesTodayPermission]
     
     def get(self, request):
         today = timezone.localdate()

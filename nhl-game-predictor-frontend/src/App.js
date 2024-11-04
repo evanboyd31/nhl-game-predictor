@@ -2,6 +2,7 @@ import "./index.css";
 import Header from "./components/Header.js";
 import GamePredictions from "./components/GamePredictions.js";
 import { useState, useEffect } from "react";
+import formatToPacificTime from "./utils/timeUtils.js";
 
 const App = () => {
   // set page title
@@ -17,8 +18,12 @@ const App = () => {
   useEffect(() => {
     const fetchGamePredictions = async () => {
       try {
+        const todayInPacificTime = formatToPacificTime(
+          new Date(),
+          "yyyy-MM-dd"
+        );
         const response = await fetch(
-          `${process.env.REACT_APP_BASE_API_URL}predict-games-today`
+          `${process.env.REACT_APP_BASE_API_URL}game-predictions/date/?date=${todayInPacificTime}`
         );
 
         if (!response.ok) {
