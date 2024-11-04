@@ -25,9 +25,5 @@ COPY . .
 # collect static files using poetry's run command
 RUN poetry run python manage.py collectstatic --noinput
 
-# handle any new migrations
-RUN poetry run python manage.py makemigrations --noinput
-RUN poetry run python manage.py migrate --noinput
-
 # command to start the django application
 CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
