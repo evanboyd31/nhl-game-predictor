@@ -29,6 +29,7 @@ const BarChart = ({ gamePrediction }) => {
       {
         label: "Importance",
         data: importances,
+        color: "rgba(255, 255, 255, 1)",
         backgroundColor: "rgba(238, 152, 58, 0.6)",
         borderColor: "rgba(238, 152, 58, 1)",
         borderWidth: 1,
@@ -38,17 +39,33 @@ const BarChart = ({ gamePrediction }) => {
 
   const options = {
     scales: {
+      x: {
+        ticks: {
+          color: "#FFFFFF",
+        },
+      },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: "#FFFFFF",
+        },
         title: {
           display: true,
           text: "Importance",
+          color: "#FFFFFF",
         },
       },
     },
     plugins: {
       legend: {
         display: false,
+        labels: {
+          color: "#FFFFFF",
+        },
+      },
+      tooltip: {
+        bodyColor: "#FFFFFF",
+        titleColor: "#FFFFFF",
       },
     },
   };
