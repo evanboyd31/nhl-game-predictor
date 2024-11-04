@@ -7,5 +7,5 @@ class PredictGamesTodayPermission(BasePermission):
     PredictGamesTodayView API endpoint
     """
     def has_permission(self, request, view):
-        token = request.headers.get('PREDICT-GAMES-TODAY-TOKEN')
+        token = request.headers.get("PREDICT-GAMES-TODAY-TOKEN")
         return token == settings.PREDICT_GAMES_TODAY_ACCESS_TOKEN
