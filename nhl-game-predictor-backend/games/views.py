@@ -92,3 +92,13 @@ class PredictGamesTodayView(APIView):
         todays_predictions = predict_games(games_today)
         serializer = GamePredictionSerializer(todays_predictions, many=True)
         return Response(serializer.data)
+    
+class KeepActiveView(APIView):
+    """
+    called every 15 minutes so the free render service does not spin down
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({"status": "Server is active"}, status=200)
