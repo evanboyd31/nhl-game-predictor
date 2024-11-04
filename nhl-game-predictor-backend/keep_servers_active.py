@@ -1,7 +1,7 @@
 import httpx
 import time
 
-URL = "https://nhl-game-predictor-backend.onrender.com/api/predict-games-today"
+URL = "https://nhl-game-predictor-backend.onrender.com/api/predict-games-today/"
 
 def keep_servers_active(number_of_seconds=60):
 
