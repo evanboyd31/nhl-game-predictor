@@ -5,6 +5,7 @@ from rest_framework.exceptions import NotFound
 from .models import Game, GamePrediction
 from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
+from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
 
 class GameDetailView(generics.RetrieveAPIView):
@@ -73,6 +74,8 @@ class PredictGamesTodayView(APIView):
     API endpoint that is called every night at midnight to generate today's game predicitions
     since you can't make chron jobs on render unless you pay :(
     """
+
+    permission_classes = [AllowAny]
     
     def get(self, request):
         today = timezone.localdate()
