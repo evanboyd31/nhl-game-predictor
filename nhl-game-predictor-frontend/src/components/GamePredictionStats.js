@@ -2,22 +2,21 @@ import React from "react";
 import GamePredictionBarChart from "./GamePredictionBarChart";
 
 const GamePredictionStats = ({ gamePrediction, isOpen }) => {
-  const winnerString = `${
+  const winningTeamName = `${
     gamePrediction.predicted_home_team_win
       ? gamePrediction.game.home_team.name
       : gamePrediction.game.away_team.name
   }`;
 
-  const teamName = winnerString.split(" ").slice(1).join(" ");
-  console.log(teamName);
-
   const topFeatures = gamePrediction.top_features;
   return isOpen.isOpen ? (
     <div className="game-prediction-stats">
       <span className="game-prediction-stats-header">
-        <span className="green-text">Predicted winner:</span>{" "}
+        Our model predicts that the{" "}
+        <span className="green-text">{winningTeamName}</span> will win today's
+        game.
         <span>
-          {teamName}. <br /> Here's why...
+          <br /> Here's why...
         </span>
       </span>
       <GamePredictionBarChart

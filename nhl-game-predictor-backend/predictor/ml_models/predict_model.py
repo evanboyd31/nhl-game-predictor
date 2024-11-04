@@ -56,7 +56,9 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
     exp = explainer.explain_instance(instance, model.predict_proba)
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
-    top_features = exp.as_list() 
+    top_features = sorted(exp.as_list(), 
+                          key=lambda top_feature: top_feature[1],
+                          reverse=True)
     top_features_df = pd.DataFrame(top_features, columns=['Feature', 'Importance'])
     
     game_feature_values = game_data_frame_entry.to_dict()
@@ -66,19 +68,21 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
     for top_feature in top_features:
         tokens = top_feature[0].split(" ")
         importance_value = top_feature[1]
+
+        # we would only like to display positive feature values to the user
+        if importance_value < 0:
+            break
+
         for token in tokens:
-            # only add if feature is not meaningless to the user
             if token in game_feature_values:
                 cleaned_features.append([token, importance_value])
                 break
 
-        # exit if we have found 5 meaningful features
+        # exit if we have found 5 positive importance featuers
         if len(cleaned_features) == 5:
             break
 
     top_features_dictionary = {cleaned_feature[0] : [game_feature_values[cleaned_feature[0]], cleaned_feature[1]] for cleaned_feature in cleaned_features}
-
-    print(top_features_dictionary)
 
     return top_features_dictionary
 

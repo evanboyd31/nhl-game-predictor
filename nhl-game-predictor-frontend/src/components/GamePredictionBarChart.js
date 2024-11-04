@@ -10,7 +10,7 @@ const transformData = (gamePrediction) => {
   const importances = Object.values(
     gamePrediction.top_features_descriptions
   ).map(
-    (feature) => feature[1] // Importance score
+    (feature) => feature[1] // importance score
   );
 
   // use numeric labels for the chart
@@ -29,6 +29,7 @@ const BarChart = ({ gamePrediction }) => {
       {
         label: "Importance",
         data: importances,
+        color: "rgba(255, 255, 255, 1)",
         backgroundColor: "rgba(238, 152, 58, 0.6)",
         borderColor: "rgba(238, 152, 58, 1)",
         borderWidth: 1,
@@ -38,17 +39,33 @@ const BarChart = ({ gamePrediction }) => {
 
   const options = {
     scales: {
+      x: {
+        ticks: {
+          color: "#FFFFFF",
+        },
+      },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: "#FFFFFF",
+        },
         title: {
           display: true,
           text: "Importance",
+          color: "#FFFFFF",
         },
       },
     },
     plugins: {
       legend: {
         display: false,
+        labels: {
+          color: "#FFFFFF",
+        },
+      },
+      tooltip: {
+        bodyColor: "#FFFFFF",
+        titleColor: "#FFFFFF",
       },
     },
   };
@@ -57,7 +74,7 @@ const BarChart = ({ gamePrediction }) => {
     <div className="chart-container">
       <Bar data={chartData} options={options} />
       <div className="legend">
-        <h4>Legend</h4>
+        <h4>Reasons:</h4>
         {originalLabels.map((label, index) => (
           <div key={index}>
             <strong>{index + 1}:</strong> {label}

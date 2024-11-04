@@ -68,8 +68,8 @@ class Game(models.Model):
     PLAYOFFS = 3
 
     # relationships to TeamData for pre-game analysis
-    home_team_data = models.ForeignKey(TeamData, on_delete=models.CASCADE, related_name='home_game_data', null=True)
-    away_team_data = models.ForeignKey(TeamData, on_delete=models.CASCADE, related_name='away_game_data', null=True)
+    home_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='home_game_data', null=True)
+    away_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='away_game_data', null=True)
 
     class Meta:
         unique_together = ('home_team', 'away_team', 'game_date')
