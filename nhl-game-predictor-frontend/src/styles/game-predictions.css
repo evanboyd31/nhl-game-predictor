@@ -85,6 +85,7 @@
 .open {
   flex-direction: column;
   align-items: center;
+  border: 7px solid #ee983a;
 }
 
 .open .game-prediction-stats {
@@ -111,4 +112,9 @@
 .legend {
   font-size: 1rem !important;
   font-weight: 100;
+}
+
+.chart-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
