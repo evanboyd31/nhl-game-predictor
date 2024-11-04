@@ -1,31 +1,33 @@
-# Use the official Python image from the Docker Hub with Python 3.11
+# ensure python version matches specified version in poetry
 FROM python:3.11-slim
 
-# Set environment variables
+# env variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
-# Set the working directory in the container
+# working directory will be app
 WORKDIR /app
 
-# Install system dependencies
+# get system dependencies
 RUN apt-get update && apt-get install -y build-essential && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy the poetry.lock and pyproject.toml files to the working directory
+# get poetry dependencies files
 COPY pyproject.toml poetry.lock ./
 
-# Install Poetry
+# install poetry and the specified dependencies within poetry
 RUN pip install poetry
-
-# Install dependencies using Poetry (without installing the current project)
 RUN poetry install --no-root
 
-# Copy the rest of your application code into the container
+# copy application
 COPY . .
 
-# Collect static files using Poetry's run command
+# collect static files using poetry's run command
 RUN poetry run python manage.py collectstatic --noinput
 
-# Start the Django application
+# handle any new migrations
+RUN poetry run python manage.py makemigrations --noinput
+RUN poetry run python manage.py migrate --noinput
+
+# command to start the django application
 CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
