@@ -1,7 +1,7 @@
 import httpx
 import time
 
-URL = "http://nhl-game-predictor-backend.onrender.com/api/predict-games-today/"
+URL = "https://nhl-game-predictor-backend.onrender.com/api/predict-games-today/"
 
 def predict_games(number_of_seconds=60*30):
     while True:

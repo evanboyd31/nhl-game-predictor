@@ -3,7 +3,7 @@ import time
 
 URL = "https://nhl-game-predictor-backend.onrender.com/api/keep-active/"
 
-def keep_servers_active(number_of_seconds=60*15):
+def keep_servers_active(number_of_seconds=60):
     while True:
         try:
             response = httpx.get(url=URL, timeout=number_of_seconds) 
