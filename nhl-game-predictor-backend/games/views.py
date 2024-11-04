@@ -7,6 +7,7 @@ from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
+from permissions import PredictGamesTodayPermission
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -100,7 +101,7 @@ class PredictGamesTodayView(APIView):
     since you can't make chron jobs on render unless you pay :(
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [PredictGamesTodayPermission]
     
     def get(self, request):
         today = timezone.localdate()
