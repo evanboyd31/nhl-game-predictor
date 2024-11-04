@@ -10,7 +10,7 @@ const transformData = (gamePrediction) => {
   const importances = Object.values(
     gamePrediction.top_features_descriptions
   ).map(
-    (feature) => feature[1] // Importance score
+    (feature) => feature[1] // importance score
   );
 
   // use numeric labels for the chart
@@ -74,7 +74,7 @@ const BarChart = ({ gamePrediction }) => {
     <div className="chart-container">
       <Bar data={chartData} options={options} />
       <div className="legend">
-        <h4>Legend</h4>
+        <h4>Reasons:</h4>
         {originalLabels.map((label, index) => (
           <div key={index}>
             <strong>{index + 1}:</strong> {label}
