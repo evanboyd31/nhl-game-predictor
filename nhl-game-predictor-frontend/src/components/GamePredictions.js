@@ -30,9 +30,10 @@ const GamePredictions = ({ gamePredictions }) => {
       <h4>Click on a game to see predictions!</h4>
       <ul className="game-predictions-list">
         {gamePredictions.map((gamePrediction) => {
+          // default to closed if not found
           const isOpenPrediction = isOpen.find(
             (item) => item.id === gamePrediction.id
-          );
+          ) || { isOpen: false };
           return (
             <GamePrediction
               gamePrediction={gamePrediction}

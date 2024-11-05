@@ -9,7 +9,7 @@ const GamePredictionStats = ({ gamePrediction, isOpen }) => {
   }`;
 
   const topFeatures = gamePrediction.top_features;
-  return isOpen.isOpen ? (
+  return isOpen?.isOpen ? (
     <div className="game-prediction-stats">
       <span className="game-prediction-stats-header">
         Our model predicts that the{" "}
