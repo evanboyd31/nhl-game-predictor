@@ -27,13 +27,25 @@ const App = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          const errorData = await response.json();
+          throw new Error(
+            errorData && errorData.detail
+              ? errorData.detail
+              : "The prediction server is currently unavailable. Please try again later!"
+          );
         }
 
         const data = await response.json();
         setPredictions(data);
       } catch (error) {
-        setError(error.message);
+        // override the default "Faild to fetch" error message with a more descriptive one
+        if (error.message === "Failed to fetch") {
+          setError(
+            "Error: The prediction server is currently unavailable. Please try again later!"
+          );
+        } else {
+          setError(error.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -42,21 +54,17 @@ const App = () => {
     fetchGamePredictions();
   }, []);
 
-  // display loading text if we need to wait
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  // display error text if an error is returned
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <div className="app-container">
       <Header />
       <div className="page-body">
-        <GamePredictions gamePredictions={predictions} />
+        {error && (
+          <div className="error-message">
+            <span className="error-message-title">Error: </span>
+            <span className="error-message-detail">{error}</span>
+          </div>
+        )}
+        {!error && <GamePredictions gamePredictions={predictions} />}
       </div>
     </div>
   );
