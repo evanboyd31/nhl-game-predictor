@@ -10,7 +10,6 @@ const App = () => {
     document.title = "NHL Game Predictions";
   }, []);
 
-  console.log(process.env.REACT_APP_BASE_API_URL);
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
