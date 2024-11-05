@@ -16,8 +16,59 @@ body,
   font-family: "Poppins", sans-serif;
   background-color: #0d1117;
   padding: 20px;
-  color: #0a1c2b;
+  color: #ffffff;
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error-message {
+  font-family: "Poppins", sans-serif;
+  color: #ff6b6b;
+  width: 375px;
+  max-width: 375px;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.error-message-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.error-message-detail {
+  font-size: 1.5rem;
+  font-weight: 200;
+  letter-spacing: 1px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #ee983a;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
 }

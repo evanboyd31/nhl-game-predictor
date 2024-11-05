@@ -19,7 +19,7 @@ const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
 
   return (
     <li
-      className={`item ${isOpen.isOpen ? "open" : ""}`}
+      className={`item ${isOpen?.isOpen ? "open" : ""}`}
       onClick={() => onGamePredictionClick(gamePredictionId)}
     >
       <h3 className="game-prediction-header">
@@ -40,7 +40,7 @@ const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
         />
       </div>
 
-      {isOpen.isOpen && (
+      {isOpen?.isOpen && (
         <GamePredictionStats gamePrediction={gamePrediction} isOpen={isOpen} />
       )}
     </li>
