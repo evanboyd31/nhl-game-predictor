@@ -70,8 +70,8 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 50px;
-  width: 90%;
   max-width: 600px;
+  width: 90%;
   border: 2px solid #ee983a;
   border-radius: 10px;
   padding-top: 0px;
@@ -81,6 +81,13 @@
   white-space: normal;
   overflow: hidden;
   box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .item {
+    max-width: 600px; /* Fixed max-width on larger screens */
+    width: 600px; /* Ensures consistent width on desktop */
+  }
 }
 
 .open {
