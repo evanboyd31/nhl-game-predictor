@@ -58,13 +58,20 @@ const App = () => {
     <div className="app-container">
       <Header />
       <div className="page-body">
-        {error && (
+        {!error && loading && (
+          <div className="spinner-container">
+            <div className="spinner"></div>
+          </div>
+        )}
+        {error && !loading && (
           <div className="error-message">
             <span className="error-message-title">Error: </span>
             <span className="error-message-detail">{error}</span>
           </div>
         )}
-        {!error && <GamePredictions gamePredictions={predictions} />}
+        {!error && !loading && (
+          <GamePredictions gamePredictions={predictions} />
+        )}
       </div>
     </div>
   );
