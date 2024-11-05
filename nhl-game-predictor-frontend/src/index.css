@@ -16,8 +16,34 @@ body,
   font-family: "Poppins", sans-serif;
   background-color: #0d1117;
   padding: 20px;
-  color: #0a1c2b;
+  color: #ffffff;
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error-message {
+  font-family: "Poppins", sans-serif;
+  color: #ff6b6b;
+  width: 375px;
+  max-width: 375px;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.error-message-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.error-message-detail {
+  font-size: 1.5rem;
+  font-weight: 200;
+  letter-spacing: 1px;
 }
