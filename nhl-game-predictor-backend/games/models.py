@@ -4,8 +4,8 @@ from django.utils import timezone
 
 class Franchise(models.Model):
     """
-    A model to represent a franchise, which can have multiple team representations
-    due to relocations or rebranding.
+    a model to represent a franchise, which can have multiple team representations
+    due to relocations or rebranding
     """
     franchise_id = models.IntegerField(unique=True)
 
@@ -24,7 +24,7 @@ class Team(models.Model):
 
 class TeamData(models.Model):
     """
-    Class to record a team's statistics for a provided day for model training
+    class to record a team's statistics for a provided day for model training
     """
 
     # associated to a team
@@ -47,7 +47,7 @@ class TeamData(models.Model):
     
 class Game(models.Model):
     """
-    Class to represent a single NHL game
+    class to represent a single NHL game
     """
     # stores game ID from the NHL API
     id = models.BigIntegerField(primary_key=True)
@@ -78,6 +78,9 @@ class Game(models.Model):
         return f"{self.home_team} vs {self.away_team} on {self.game_date.strftime('%Y-%m-%d %H:%M')}"
     
     def is_completed(self):
+        """
+        a game is defined as completed if the date of the game is in the past
+        """
         current_date = timezone.localdate()
         return current_date > self.game_date
     
