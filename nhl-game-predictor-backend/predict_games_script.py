@@ -6,6 +6,12 @@ URL = "https://nhl-game-predictor-backend.onrender.com/api/predict-games-today/"
 PREDICT_GAMES_TODAY_ACCESS_TOKEN = os.getenv("PREDICT_GAMES_TODAY_ACCESS_TOKEN", "")
 
 def predict_games(number_of_seconds=60*30):
+    """
+    function to ping the PredictGamesTodayView REST API endpoint every
+    number_of_seconds seconds
+    """
+
+    # the PredictGamesTodayView endpoint must be provided the correct token to predict games for today
     headers = {"PREDICT-GAMES-TODAY-TOKEN": PREDICT_GAMES_TODAY_ACCESS_TOKEN}
     while True:
         try:
