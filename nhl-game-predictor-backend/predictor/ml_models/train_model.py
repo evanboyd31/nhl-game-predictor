@@ -17,6 +17,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
 def generate_past_season_ids(past_seasons):
+    """
+    generates a list of the n past season IDs of the form 20XX20XX
+    as required by the official NHL API
+    """
     current_date = timezone.localdate()
     current_month = current_date.month
     current_year = current_date.year
@@ -36,21 +40,29 @@ def generate_past_season_ids(past_seasons):
     return season_ids
 
 def create_seasons_dataframe(past_seasons):
-    # Fetch all Game records for the specified past seasons
+    """
+    creates a pandas dataframe of all games that took place in the
+    list of seasons in past_seasons array of season IDs
+    """
+    # fetch all Game records for the specified past seasons
     games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
 
-    # Create GameDataFrameEntry instances for each game
+    # create GameDataFrameEntry instances for each game
     game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
 
-    # Convert the list of entries to a list of dictionaries
+    # convert the list of entries to a list of dictionaries
     game_data_dicts = [entry.to_dict() for entry in game_dataframe_entries]
 
-    # Create a DataFrame from the list of dictionaries
+    # create a DataFrame from the list of dictionaries
     game_data_df = pd.DataFrame(game_data_dicts)
 
     return game_data_df
 
 def create_training_data(game_data_df):
+    """
+    splits a pandas dataframe of game data into training and validation sets
+    as required by the Random Forest model
+    """
     # split features and labels from dataframe
     features = game_data_df.drop(columns=['home_team_win'])
     labels = game_data_df['home_team_win']
@@ -63,6 +75,11 @@ def create_training_data(game_data_df):
 
 @transaction.atomic
 def train_random_forest(past_seasons):
+    """
+    trains a new Random Forest model on the seasons in the past_seasons array.
+    for example, calling train_random_forest([20242025, 20232024]) will train 
+    a new Random Forest using data from the 2024-2025 and 2023-2024 NHL seasons
+    """
     game_data_df = create_seasons_dataframe(past_seasons=past_seasons)
 
     training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
