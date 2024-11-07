@@ -6,6 +6,12 @@ django.setup()
 
 
 class GameDataFrameEntry:
+    """
+    class to represent a Game model instance
+    as an entry in a pandas dataframe used for training
+    a Random Forest model
+    """
+
     def __init__(self, game: Game):
         game_json = game.game_json
         home_team_data = game.home_team_data
@@ -82,7 +88,7 @@ class GameDataFrameEntry:
 
     def to_dict(self):
         """
-        Convert the instance to a dictionary for easy DataFrame creation.
+        convert the GameDataFrameEntry instance to a dictionary for easy DataFrame creation
         """
         return {
             "home_team": self.home_team,

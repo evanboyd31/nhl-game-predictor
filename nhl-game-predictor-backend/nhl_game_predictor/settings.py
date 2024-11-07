@@ -25,6 +25,7 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY", "default_security_key")
 
+# the timezone of this Django app is west coast time
 TIME_ZONE = 'America/Los_Angeles'
 USE_TZ = True
 
@@ -32,6 +33,7 @@ USE_TZ = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+# allowed hosts for development and production environments
 ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 
                  'nhl-game-predictor-backend.onrender.com', 
                  'localhost', 
@@ -46,7 +48,6 @@ CORS_ALLOWED_ORIGINS = [
     'https://nhl-game-predictor.onrender.com',
     "http://localhost:3000",
     "http://127.0.0.1:3000", 
-
 ]
 
 SESSION_COOKIE_SECURE = True
@@ -155,7 +156,8 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# default base NHL API URL for the new NHL API
 NHL_API_BASE_URL = "https://api-web.nhle.com/v1/"
 
+# access token for calling PredictGamesTodayView REST API endpoint
 PREDICT_GAMES_TODAY_ACCESS_TOKEN = os.getenv("PREDICT_GAMES_TODAY_ACCESS_TOKEN", "")

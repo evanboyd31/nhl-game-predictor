@@ -4,6 +4,11 @@ import time
 URL = "https://nhl-game-predictor-backend.onrender.com/api/keep-active/"
 
 def keep_servers_active(number_of_seconds=60):
+    """
+    function to ping the KeepActiveView REST API endpoint every
+    number_of_seconds seconds
+    """
+    
     while True:
         try:
             response = httpx.get(url=URL, timeout=number_of_seconds) 

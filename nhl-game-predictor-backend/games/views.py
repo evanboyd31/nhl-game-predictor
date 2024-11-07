@@ -11,13 +11,18 @@ from .permissions import PredictGamesTodayPermission
 
 class GameDetailView(generics.RetrieveAPIView):
     """
-    Retrieve a Game by its ID.
+    REST API endpoint to return a Game instance
+    based on its ID
     """
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     lookup_field = 'id'
 
 class GameListByDateView(generics.ListAPIView):
+    """
+    REST API endpoint to return all Game instances
+    scheduled on a particular date
+    """
     serializer_class = GameSerializer
 
     def get_queryset(self):
@@ -35,8 +40,9 @@ class GameListByDateView(generics.ListAPIView):
 
 class GamePredictionByGameIdView(APIView):
     """
-    Get a game prediction for a provided Game's id. When only 1 PredictionModel is in use,
-    any Game associated to a GamePrediction will be associated to exactly 1 GamePrediction
+    REST API endpoint to get a game prediction for a provided Game's id. 
+    When only 1 PredictionModel is in use, any Game associated to a 
+    GamePrediction will be associated to exactly 1 GamePrediction
     """
     def get(self, request, game_id, *args, **kwargs):
         try:
@@ -48,9 +54,17 @@ class GamePredictionByGameIdView(APIView):
         return Response(serializer.data)
 
 class GamePredictionListByDateView(generics.ListAPIView):
+    """
+    REST API endpoint to get all GamePredictions for Game instances 
+    that are scheduled for the provided date
+    """
     serializer_class = GamePredictionSerializer
 
     def get_date(self):
+        """
+        extracts the date out of the query parameters,
+        and throws a relevant error if it is not provided
+        """
         date_str = self.request.query_params.get('date')
         # caller must provide a date to find game predictions
         if not date_str:
@@ -97,10 +111,12 @@ class GamePredictionListByDateView(generics.ListAPIView):
     
 class PredictGamesTodayView(APIView):
     """
-    API endpoint that is called every night at midnight to generate today's game predicitions
-    since you can't make chron jobs on render unless you pay :(
+    REST API endpoint that is called periodically by the predict_games_script.py script
+    since you can't make chron jobs on Render unless you pay :(
     """
 
+    # only callers with a specific API token can call this endpoint to predict games
+    # so the RAM limit of the Render backend server is not exceeded
     permission_classes = [PredictGamesTodayPermission]
     
     def get(self, request):
