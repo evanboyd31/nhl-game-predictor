@@ -24,6 +24,12 @@ REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
 @transaction.atomic
 def load_franchises_and_teams_data_from_api():
+    """
+    using the official NHL API, this function gets a list of all franchises
+    that have ever existed in the NHL, and creates new Franchise model instances
+    to represent them
+    """
+
     franchise_url = f"https://api.nhle.com/stats/rest/en/team"
     franchise_response = httpx.get(franchise_url)
 
@@ -49,8 +55,9 @@ def load_franchises_and_teams_data_from_api():
 def load_active_team_logo_urls():
     """
     using the NHL API, load each NHL team's name, abbreviation, and logo url
-    into a Team model class and store in the db
+    into a Team model instance and store in the database
     """
+
     # create current date string for standings_url
     current_date = timezone.localdate()
     formatted_date = current_date.strftime("%Y-%m-%d")
@@ -85,6 +92,11 @@ def load_active_team_logo_urls():
 
 @transaction.atomic
 def load_team_data_for_date_from_api(team : Team, game_date):
+    """
+    creates a TeamData instance for a particular game. a TeamData
+    instance is the team's statistics on the day prior to the game, as provided
+    by the official NHL API
+    """
 
     # get the date before a game
     previous_day = game_date - timedelta(days=1)
@@ -117,12 +129,13 @@ def load_team_data_for_date_from_api(team : Team, game_date):
 @transaction.atomic
 def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True):
     """
-    given the abbreviation of a team, load Game and GameData model instances
-    into the db. 
+    given the abbreviation of a team, load Game and TeamData model instances
+    into the database. 
     
     the seasons parameter is a list of season IDs that are compliant with the NHL API.
     For example, the 2024-2025 season has an ID of 20242025
-    
+
+    TeamData instances are the team's statistics a day prior to a Game
     """
 
     # get the team by its abbreviation
@@ -210,6 +223,11 @@ def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True)
 
 @transaction.atomic
 def load_games_for_all_teams_from_api(seasons, get_team_data=True):
+    """
+    given a list of season ids (such as [20202021, 20212022]), get all
+    NHL games for each of the seasons. optionally, create TeamData instances,
+    which are each team's statistics the day prior to a game
+    """
     teams = Team.objects.all()
 
     for team in teams:
@@ -219,6 +237,10 @@ def load_games_for_all_teams_from_api(seasons, get_team_data=True):
     
 @transaction.atomic
 def clear_database():
+    """
+    function used to manually clear all instances in the database from
+    the Django shell
+    """
     Team.objects.all().delete()
     Game.objects.all().delete()
     TeamData.objects.all().delete()
