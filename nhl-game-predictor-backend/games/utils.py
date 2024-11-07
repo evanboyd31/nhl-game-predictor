@@ -1,3 +1,7 @@
+"""
+provided an integer in the range [1, 12], this dictionary
+maps the integer to the corresponding month name
+"""
 month_dictionary = {
     1: "January",
     2: "February",
@@ -13,6 +17,10 @@ month_dictionary = {
     12: "December"
 }
 
+"""
+provided an integer in the range [0, 6], this dictionary
+maps the integer to the corresponding day of week name
+"""
 weekday_dictionary = {
     0: "Monday",
     1: "Tuesday",
@@ -23,6 +31,12 @@ weekday_dictionary = {
     6: "Sunday"
 }
 
+"""
+given a feature name used in the machine learning training, this dictionary 
+provides a function that, when given the instance of the Game, will be formatted 
+into a string that is descriptive and contains relevant stats. useful for displaying
+feature importances in the React frontend
+"""
 cleaned_feature_names_dictionary = {
     "home_team": lambda game: f"The {game.home_team.name} are the home team",
     "away_team": lambda game: f"The {game.away_team.name} are the away team",
