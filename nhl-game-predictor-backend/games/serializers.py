@@ -7,17 +7,31 @@ from predictor.serializers import PredictionModelSerializer
 from .utils import cleaned_feature_names_dictionary
 
 class FranchiseSerializer(serializers.ModelSerializer):
+    """
+    serializes all fields of a Franchise model instance into
+    JSON
+    """
+
     class Meta:
         model = Franchise
         fields = '__all__'
 
 class TeamSerializer(serializers.ModelSerializer):
+    """
+    serializes all fields of a Team model instance into JSON
+    """
+
     franchise = FranchiseSerializer(serializers.ModelSerializer)
+
     class Meta:
         model = Team
         fields = '__all__'
 
 class TeamDataSerializer(serializers.ModelSerializer):
+    """
+    serializes all fields of a TeamData model instance into JSON
+    """
+    
     team = TeamSerializer()
 
     class Meta:
@@ -25,6 +39,10 @@ class TeamDataSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GameSerializer(serializers.ModelSerializer):
+    """
+    serializes all fields of a Game model instance into JSON
+    """
+
     home_team = TeamSerializer() 
     away_team = TeamSerializer()
 
@@ -34,6 +52,12 @@ class GameSerializer(serializers.ModelSerializer):
 
 
 class GamePredictionSerializer(serializers.ModelSerializer):
+    """
+    serializes all fields of a GamePrediction model instance into JSON,
+    along with an extra JSON entry of descriptive feature explanations 
+    called top_feature_descriptions
+    """
+
     game = GameSerializer()
     model = PredictionModelSerializer()
     
@@ -41,7 +65,9 @@ class GamePredictionSerializer(serializers.ModelSerializer):
 
     def get_top_features_descriptions(self, obj):
         """
-        Maps the original feature name to its corresponding descriptive feature.
+        maps the original feature name to its corresponding descriptive feature sentence
+        to display in the React frontend. the descriptions are stored in the 
+        cleaned_features_names_dictionary in games.utils.py
         """
         top_features = obj.top_features or {}
         game = obj.game
