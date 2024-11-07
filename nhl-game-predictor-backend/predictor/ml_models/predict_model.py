@@ -1,6 +1,5 @@
 import os
-import django 
-import re
+import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 django.setup()
 
@@ -37,7 +36,7 @@ def load_random_forest_model():
 
 def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, model, training_features):
     """
-    Get the top n features driving the prediction confidence for a specific game.
+    get the top 5 features driving the prediction outcome for a specific game
     """
 
     # use lime explainer. class_names is the label we're trying to predict
@@ -69,7 +68,7 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
         tokens = top_feature[0].split(" ")
         importance_value = top_feature[1]
 
-        # we would only like to display positive feature values to the user
+        # we would only like to display positive feature values to the user for clarity
         if importance_value < 0:
             break
 
