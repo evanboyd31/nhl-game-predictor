@@ -1,6 +1,12 @@
 import React from "react";
 import GamePredictionBarChart from "./GamePredictionBarChart";
 
+/**
+ * The GamePredictionStats component is a container that
+ * displays the name of the winning team and holds the importances
+ * GamePredictionBarChart, only when the parent GamePrediction
+ * component has been opened
+ */
 const GamePredictionStats = ({ gamePrediction, isOpen }) => {
   const winningTeamName = `${
     gamePrediction.predicted_home_team_win
