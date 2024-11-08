@@ -4,7 +4,12 @@ import "../styles/game-predictions.css";
 import GamePrediction from "./GamePrediction";
 import formatToPacificTime from "../utils/timeUtils";
 
+/**
+ * The GamePredictions component is the vertical component that contains each
+ * GamePrediction component for the selected date.
+ */
 const GamePredictions = ({ gamePredictions }) => {
+  // the timezone of the backend and the frontend is Pacific Time
   const todayInPacificTime = formatToPacificTime(new Date(), "yyyy-MM-dd");
   const [isOpen, setIsOpen] = useState(
     gamePredictions.map((gamePrediction) => ({
@@ -13,6 +18,12 @@ const GamePredictions = ({ gamePredictions }) => {
     }))
   );
 
+  /**
+   * The handleGamePredictionClick function will set the isOpen
+   * state of the clicked GamePrediction to true so that relevant
+   * GamePrediction data is displayed to the user
+   * @param {Number} gamePredictionId - ID of GamePrediction object that had its corresponding div clicked
+   */
   const handleGamePredictionClick = (gamePredictionId) => {
     setIsOpen(
       isOpen.map((gamePrediction) =>
