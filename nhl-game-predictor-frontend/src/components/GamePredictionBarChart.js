@@ -5,7 +5,12 @@ import { Chart, registerables } from "chart.js";
 // register chart js so components can be used
 Chart.register(...registerables);
 
-const transformData = (gamePrediction) => {
+/**
+ * Given a game prediction, extract the game prediction data
+ * into legend labels, original labels, and importances for the
+ * GamePredictionBarChart component
+ */
+const extractGamePredictionData = (gamePrediction) => {
   // extract descriptions and importances from top_features_descriptions
   const originalLabels = Object.keys(gamePrediction.top_features_descriptions);
   const importances = Object.values(
@@ -22,8 +27,9 @@ const transformData = (gamePrediction) => {
 
 const GamePredictionBarChart = ({ gamePrediction }) => {
   const { legendLabels, originalLabels, importances } =
-    transformData(gamePrediction);
+    extractGamePredictionData(gamePrediction);
 
+  // set the chart data for the Bar chart.js component
   const chartData = {
     labels: legendLabels,
     datasets: [
@@ -38,6 +44,7 @@ const GamePredictionBarChart = ({ gamePrediction }) => {
     ],
   };
 
+  // options for the Bar chart.js component
   const options = {
     scales: {
       x: {
