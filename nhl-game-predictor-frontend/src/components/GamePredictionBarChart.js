@@ -2,6 +2,7 @@ import React from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
+// register chart js so components can be used
 Chart.register(...registerables);
 
 const transformData = (gamePrediction) => {
@@ -19,7 +20,7 @@ const transformData = (gamePrediction) => {
   return { legendLabels, originalLabels, importances };
 };
 
-const BarChart = ({ gamePrediction }) => {
+const GamePredictionBarChart = ({ gamePrediction }) => {
   const { legendLabels, originalLabels, importances } =
     transformData(gamePrediction);
 
@@ -85,4 +86,4 @@ const BarChart = ({ gamePrediction }) => {
   );
 };
 
-export default BarChart;
+export default GamePredictionBarChart;
