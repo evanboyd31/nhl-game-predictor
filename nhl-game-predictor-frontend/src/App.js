@@ -10,13 +10,19 @@ const App = () => {
     document.title = "NHL Game Predictions";
   }, []);
 
+  // game predictions for the requested date
   const [predictions, setPredictions] = useState([]);
+
+  // whether the game predictions API has responded
   const [loading, setLoading] = useState(true);
+
+  // holds the error returned by the game predictions API endpoint
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchGamePredictions = async () => {
       try {
+        // the REST API operates in Pacific Time, so request the current day in pacific time
         const todayInPacificTime = formatToPacificTime(
           new Date(),
           "yyyy-MM-dd"
@@ -25,6 +31,7 @@ const App = () => {
           `${process.env.REACT_APP_BASE_API_URL}game-predictions/date/?date=${todayInPacificTime}`
         );
 
+        // throw a custom error message that is more clear when the REST API endpoint doesn't reply
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
