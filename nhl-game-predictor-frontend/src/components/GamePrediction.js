@@ -1,6 +1,13 @@
 import React from "react";
 import GamePredictionStats from "./GamePredictionStats";
 
+/**
+ * The GamePrediction component is the individual component displayed for
+ * each of the NHL games schedule on a current day. The GamePrediction
+ * component can be clicked on, which will expand the div and show the
+ * predicted winner and related statistics in a GamePredictionStats
+ * component
+ */
 const GamePrediction = ({ gamePrediction, isOpen, onGamePredictionClick }) => {
   // extract relevant game info from Game, Team, GamePrediction objects
   const game = gamePrediction.game;
