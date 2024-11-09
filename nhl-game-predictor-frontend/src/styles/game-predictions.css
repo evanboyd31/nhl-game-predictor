@@ -135,6 +135,7 @@
   position: relative;
   width: 200px;
   height: 200px;
+  margin-bottom: 20px;
 }
 
 .doughnut-text {
@@ -143,7 +144,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: #328e44;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
 }
 
