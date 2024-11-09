@@ -27,7 +27,7 @@ const GamePredictionStats = ({ gamePrediction, isOpen }) => {
       <span className="game-prediction-stats-header">
         Our model predicts that the{" "}
         <span className="green-text">{winningTeamName}</span> will win today's
-        game with a confidence of{" "}
+        game with a certainty of{" "}
         <span className="green-text">{confidenceLevel}%</span>.
         <span>
           <br />
