@@ -53,6 +53,10 @@
 .open .game-prediction-stats {
   max-height: 300px;
   overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .item {
