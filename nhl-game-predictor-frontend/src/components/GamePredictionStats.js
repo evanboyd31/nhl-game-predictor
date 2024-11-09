@@ -1,5 +1,6 @@
 import React from "react";
 import GamePredictionBarChart from "./GamePredictionBarChart";
+import GamePredictionConfidence from "./GamePredictionConfidence";
 
 /**
  * The GamePredictionStats component is a container that
@@ -14,14 +15,22 @@ const GamePredictionStats = ({ gamePrediction, isOpen }) => {
       : gamePrediction.game.away_team.name
   }`;
 
+  const confidenceLevel = Math.round(gamePrediction.confidence_score * 100);
+
   const topFeatures = gamePrediction.top_features;
   return isOpen?.isOpen ? (
     <div className="game-prediction-stats">
+      <GamePredictionConfidence
+        gamePrediction={gamePrediction}
+        isOpen={isOpen}
+      />
       <span className="game-prediction-stats-header">
         Our model predicts that the{" "}
         <span className="green-text">{winningTeamName}</span> will win today's
-        game.
+        game with a confidence of{" "}
+        <span className="green-text">{confidenceLevel}%</span>.
         <span>
+          <br />
           <br /> Here's why...
         </span>
       </span>
