@@ -20,20 +20,21 @@ const GamePredictionStats = ({ gamePrediction, isOpen }) => {
   const topFeatures = gamePrediction.top_features;
   return isOpen?.isOpen ? (
     <div className="game-prediction-stats">
-      <GamePredictionConfidence
-        gamePrediction={gamePrediction}
-        isOpen={isOpen}
-      />
       <span className="game-prediction-stats-header">
         Our model predicts that the{" "}
         <span className="green-text">{winningTeamName}</span> will win today's
         game with a certainty of{" "}
         <span className="green-text">{confidenceLevel}%</span>.
-        <span>
-          <br />
-          <br /> Here's why...
-        </span>
       </span>
+      <GamePredictionConfidence
+        gamePrediction={gamePrediction}
+        isOpen={isOpen}
+      />
+      <span className="game-prediction-stats-header">
+        <br />
+        <br /> Here's why...
+      </span>
+
       <GamePredictionBarChart
         gamePrediction={gamePrediction}
         topFeatures={topFeatures}
