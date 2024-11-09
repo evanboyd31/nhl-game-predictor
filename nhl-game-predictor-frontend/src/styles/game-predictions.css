@@ -130,3 +130,9 @@
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+.doughnut-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
