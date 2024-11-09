@@ -136,3 +136,22 @@
   width: 200px;
   height: 200px;
 }
+
+.doughnut-text {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #328e44;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.winning-team-logo-doughnut {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 125px; /* Adjust the size of the logo as needed */
+  height: 125px; /* Adjust the size of the logo as needed */
+}
