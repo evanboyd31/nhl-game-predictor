@@ -58,22 +58,30 @@ const GamePredictionConfidence = ({ gamePrediction, isOpen }) => {
     };
   }, [confidenceLevel]); // Re-run effect if confidenceLevel changes
 
+  const winningTeamName = `${
+    gamePrediction.predicted_home_team_win
+      ? gamePrediction.game.home_team.name
+      : gamePrediction.game.away_team.name
+  }`;
+
+  const gameJson = gamePrediction.game.game_json;
+  const homeTeamDarkLogoURL = gameJson.homeTeam.darkLogo;
+  const awayTeamDarkLogoURL = gameJson.awayTeam.darkLogo;
+  const winningTeamLogoURL = `${
+    gamePrediction.predicted_home_team_win
+      ? homeTeamDarkLogoURL
+      : awayTeamDarkLogoURL
+  }`;
+
   return (
-    <div style={{ position: "relative", width: "200px", height: "200px" }}>
+    <div className="doughnut-container">
       <canvas ref={canvasRef} width={120} height={120} />
-      <div
-        style={{
-          position: "absolute",
-          top: "55%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          color: "#328e44",
-          fontSize: "18px",
-          fontWeight: "bold",
-        }}
-      >
-        {`${confidenceLevel}%`}
-      </div>
+      <img
+        src={winningTeamLogoURL}
+        alt={`${winningTeamName} Logo`}
+        className="winning-team-logo-doughnut"
+      />
+      <div className="doughnut-text">{`${confidenceLevel}%`}</div>
     </div>
   );
 };
