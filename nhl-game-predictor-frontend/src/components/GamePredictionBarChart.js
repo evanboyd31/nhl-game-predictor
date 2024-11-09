@@ -65,6 +65,7 @@ const GamePredictionBarChart = ({ gamePrediction }) => {
       },
     },
     plugins: {
+      datalabels: false,
       legend: {
         display: false,
         labels: {
