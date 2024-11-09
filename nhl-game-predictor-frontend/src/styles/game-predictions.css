@@ -46,8 +46,9 @@
 }
 
 .game-prediction-stats-header {
-  font-size: 1rem;
+  font-size: 20px;
   font-weight: 600;
+  margin: 10px;
 }
 
 .open .game-prediction-stats {
@@ -135,7 +136,6 @@
   position: relative;
   width: 200px;
   height: 200px;
-  margin-bottom: 20px;
 }
 
 .doughnut-text {
