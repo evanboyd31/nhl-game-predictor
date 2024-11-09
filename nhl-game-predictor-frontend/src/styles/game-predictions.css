@@ -46,13 +46,18 @@
 }
 
 .game-prediction-stats-header {
-  font-size: 1rem;
+  font-size: 20px;
   font-weight: 600;
+  margin: 10px;
 }
 
 .open .game-prediction-stats {
   max-height: 300px;
   overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .item {
@@ -125,4 +130,29 @@
 .chart-container {
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.doughnut-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.doughnut-text {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #328e44;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.winning-team-logo-doughnut {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 125px; /* Adjust the size of the logo as needed */
+  height: 125px; /* Adjust the size of the logo as needed */
 }
