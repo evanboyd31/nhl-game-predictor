@@ -27,3 +27,7 @@ The NHL Game Prediction web application can be viewed [here](https://nhl-game-pr
 
 ### View detailed statistics used in the machine learning model's prediction
 ![image](https://github.com/user-attachments/assets/032f7e79-fb07-472b-8008-79d9f5239f5f)
+
+## License 
+
+All rights reserved. The code and content of this repository cannot be used, modified, or distributed without explicit permission
