@@ -16,3 +16,14 @@ Welcome to [@evanboyd31](https://github.com/evanboyd31)'s NHL Game Prediction We
 ## View Online
 
 The NHL Game Prediction web application can be viewed [here](https://nhl-game-predictor.onrender.com/).
+
+## Features
+
+### Landing page
+![image](https://github.com/user-attachments/assets/2016a170-f1a6-4847-ab16-fadc325e6e13)
+
+### Click on a game to view prediction
+![image](https://github.com/user-attachments/assets/f5f47296-7fbc-4220-9d35-862289e1e309)
+
+### View detailed statistics used in the machine learning model's prediction
+![image](https://github.com/user-attachments/assets/032f7e79-fb07-472b-8008-79d9f5239f5f)
