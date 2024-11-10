@@ -30,4 +30,4 @@ The NHL Game Prediction web application can be viewed [here](https://nhl-game-pr
 
 ## License 
 
-All rights reserved. The code and content of this repository cannot be used, modified, or distributed without explicit permission
+All rights reserved. The code and content of this repository cannot be used, modified, or distributed without explicit permission from the author.
