@@ -1,6 +1,7 @@
 import "./index.css";
 import Header from "./components/Header.js";
 import GamePredictions from "./components/GamePredictions.js";
+import Footer from "./components/Footer.js";
 import { useState, useEffect } from "react";
 import formatToPacificTime from "./utils/timeUtils.js";
 
@@ -79,6 +80,7 @@ const App = () => {
           <GamePredictions gamePredictions={predictions} />
         )}
       </div>
+      <Footer />
     </div>
   );
 };
