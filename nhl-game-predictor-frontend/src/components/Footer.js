@@ -10,7 +10,7 @@ const Footer = () => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <img src={githubLogo} alt="Github link" className="nhl-logo" />
+        <img src={githubLogo} alt="Github link" className="github-logo" />
       </a>
     </footer>
   );

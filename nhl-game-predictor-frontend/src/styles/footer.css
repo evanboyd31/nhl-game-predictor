@@ -1,0 +1,21 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #18181b; /* Dark background like GitHub */
+  padding: 20px;
+  color: #ffffff; /* White text for contrast */
+  border-top: 2px solid #ee983a; /* Retro NHL orange border */
+}
+
+.github-logo {
+  width: 75px;
+  height: 75px;
+  height: auto;
+  margin-right: 15px;
+  filter: brightness(3);
+}
+
+.github-logo:hover {
+  filter: brightness(2);
+}
