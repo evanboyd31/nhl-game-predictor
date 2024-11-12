@@ -46,7 +46,7 @@ cleaned_feature_names_dictionary = {
 
     # Home team overall metrics
     "home_team_win_percentage": lambda game: f"The {game.home_team.name} have a win percentage of {(game.home_team_data.team_data_json.get('wins', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
-    "home_team_loss_percentage": lambda game: f"The {game.home_team.name} have a loss percentage of {(game.home_team_data.team_data_json.get('losses', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
+    "home_team_loss_percentage": lambda game: f"The {game.home_team.name} have a regulation loss percentage of {(game.home_team_data.team_data_json.get('losses', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "home_team_ot_loss_percentage": lambda game: f"The {game.home_team.name} have an overtime loss percentage of {(game.home_team_data.team_data_json.get('otLosses', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "home_team_goals_for_per_game": lambda game: f"The {game.home_team.name} score an average of {(game.home_team_data.team_data_json.get('goalFor', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))):.2f} goals per game",
     "home_team_goals_against_per_game": lambda game: f"The {game.home_team.name} allow an average of {(game.home_team_data.team_data_json.get('goalAgainst', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))):.2f} goals against per game",
@@ -54,7 +54,7 @@ cleaned_feature_names_dictionary = {
 
     # Home team last 10 games data
     "home_team_l10_win_percentage": lambda game: f"In the last 10 games, the {game.home_team.name} have a win percentage of {(game.home_team_data.team_data_json.get('l10Wins', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
-    "home_team_l10_loss_percentage": lambda game: f"In the last 10 games, the {game.home_team.name} have a loss percentage of {(game.home_team_data.team_data_json.get('l10Losses', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
+    "home_team_l10_loss_percentage": lambda game: f"In the last 10 games, the {game.home_team.name} have a regulation loss percentage of {(game.home_team_data.team_data_json.get('l10Losses', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
     "home_team_l10_ot_losses": lambda game: f"The {game.home_team.name} have an overtime loss percentage of {(game.home_team_data.team_data_json.get('l10OtLosses', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}% in the last 10 games",
     "home_team_l10_goals_for_per_game": lambda game: f"The {game.home_team.name} scored an average of {(game.home_team_data.team_data_json.get('l10GoalsFor', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))):.2f} goals per game in the last 10 games",
     "home_team_l10_goals_against_per_game": lambda game: f"The {game.home_team.name} allowed an average of {(game.home_team_data.team_data_json.get('l10GoalsAgainst', 0) / max(1, game.home_team_data.team_data_json.get('l10GamesPlayed', 1))):.2f} goals against per game in the last 10 games",
@@ -62,12 +62,12 @@ cleaned_feature_names_dictionary = {
 
     # Home team home data
     "home_team_home_win_percentage": lambda game: f"At home, the {game.home_team.name} have a win percentage of {(game.home_team_data.team_data_json.get('homeWins', 0) / max(1, game.home_team_data.team_data_json.get('homeGamesPlayed', 1))) * 100:.2f}%",
-    "home_team_home_loss_percentage": lambda game: f"At home, the {game.home_team.name} have a loss percentage of {(game.home_team_data.team_data_json.get('homeLosses', 0) / max(1, game.home_team_data.team_data_json.get('homeGamesPlayed', 1))) * 100:.2f}%",
+    "home_team_home_loss_percentage": lambda game: f"At home, the {game.home_team.name} have a regulation loss percentage of {(game.home_team_data.team_data_json.get('homeLosses', 0) / max(1, game.home_team_data.team_data_json.get('homeGamesPlayed', 1))) * 100:.2f}%",
     "home_team_home_ot_loss_percentage": lambda game: f"At home, the {game.home_team.name} have an overtime loss percentage of {(game.home_team_data.team_data_json.get('homeOtLosses', 0) / max(1, game.home_team_data.team_data_json.get('homeGamesPlayed', 1))) * 100:.2f}%",
 
     # Away team overall metrics
     "away_team_win_percentage": lambda game: f"The {game.away_team.name} have a win percentage of {(game.away_team_data.team_data_json.get('wins', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
-    "away_team_loss_percentage": lambda game: f"The {game.away_team.name} have a loss percentage of {(game.away_team_data.team_data_json.get('losses', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
+    "away_team_loss_percentage": lambda game: f"The {game.away_team.name} have a regulation loss percentage of {(game.away_team_data.team_data_json.get('losses', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "away_team_ot_loss_percentage": lambda game: f"The {game.away_team.name} have an overtime loss percentage of {(game.away_team_data.team_data_json.get('otLosses', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "away_team_goals_for_per_game": lambda game: f"The {game.away_team.name} score an average of {(game.away_team_data.team_data_json.get('goalFor', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))):.2f} goals per game",
     "away_team_goals_against_per_game": lambda game: f"The {game.away_team.name} allow an average of {(game.away_team_data.team_data_json.get('goalAgainst', 0) / max(1, game.away_team_data.team_data_json.get('gamesPlayed', 1))):.2f} goals against per game",
@@ -75,7 +75,7 @@ cleaned_feature_names_dictionary = {
 
     # Away team last 10 games data
     "away_team_l10_win_percentage": lambda game: f"In the last 10 games, the {game.away_team.name} have a win percentage of {(game.away_team_data.team_data_json.get('l10Wins', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
-    "away_team_l10_loss_percentage": lambda game: f"In the last 10 games, the {game.away_team.name} have a loss percentage of {(game.away_team_data.team_data_json.get('l10Losses', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
+    "away_team_l10_loss_percentage": lambda game: f"In the last 10 games, the {game.away_team.name} have a regulation loss percentage of {(game.away_team_data.team_data_json.get('l10Losses', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
     "away_team_l10_ot_losses": lambda game: f"In the last 10 games, the {game.away_team.name} have an overtime loss percentage of {(game.away_team_data.team_data_json.get('l10OtLosses', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))) * 100:.2f}%",
     "away_team_l10_goals_for_per_game": lambda game: f"In the last 10 games, the {game.away_team.name} score an average of {(game.away_team_data.team_data_json.get('l10GoalsFor', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))):.2f} goals per game",
     "away_team_l10_goals_against_per_game": lambda game: f"In the last 10 games, the {game.away_team.name} allow an average of {(game.away_team_data.team_data_json.get('l10GoalsAgainst', 0) / max(1, game.away_team_data.team_data_json.get('l10GamesPlayed', 1))):.2f} goals against per game",
@@ -83,7 +83,7 @@ cleaned_feature_names_dictionary = {
 
     # Away team road data
     "away_team_road_win_percentage": lambda game: f"On the road, the {game.away_team.name} have a win percentage of {(game.away_team_data.team_data_json.get('roadWins', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))) * 100:.2f}%",
-    "away_team_road_loss_percentage": lambda game: f"On the road, the {game.away_team.name} have a loss percentage of {(game.away_team_data.team_data_json.get('roadLosses', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))) * 100:.2f}%",
+    "away_team_road_loss_percentage": lambda game: f"On the road, the {game.away_team.name} have a regulation loss percentage of {(game.away_team_data.team_data_json.get('roadLosses', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))) * 100:.2f}%",
     "away_team_road_ot_loss_percentage": lambda game: f"On the road, the {game.away_team.name} have an overtime loss percentage of {(game.away_team_data.team_data_json.get('roadOtLosses', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))) * 100:.2f}%",
     "away_team_road_goals_for_per_game": lambda game: f"On the road, the {game.away_team.name} score an average of {(game.away_team_data.team_data_json.get('roadGoalsFor', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))):.2f} goals per game",
     "away_team_road_goals_against_per_game": lambda game: f"On the road, the {game.away_team.name} allow an average of {(game.away_team_data.team_data_json.get('roadGoalsAgainst', 0) / max(1, game.away_team_data.team_data_json.get('roadGamesPlayed', 1))):.2f} goals against per game",
