@@ -6,7 +6,7 @@ from predictor.models import PredictionModel
 import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from utils import create_seasons_dataframe, create_training_data
+from predictor.ml_models.utils import create_seasons_dataframe, create_training_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
