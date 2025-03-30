@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
+RANDOM_SEED = 31
 
 class GameDataFrameEntry:
     """
@@ -171,20 +172,27 @@ def create_seasons_dataframe(past_seasons):
 
     return game_data_df
 
+
+def create_features_and_labels(game_data_df):
+    features = game_data_df.drop(columns=['home_team_win'])
+    labels = game_data_df['home_team_win']
+    return features, labels
+
+
 def create_training_data(game_data_df):
     """
     splits a pandas dataframe of game data into training and validation sets
     as required by the Random Forest model
     """
     # split features and labels from dataframe
-    features = game_data_df.drop(columns=['home_team_win'])
-    labels = game_data_df['home_team_win']
+    features, labels = create_features_and_labels(game_data_df=game_data_df)
 
     # split of training and validation data
     return train_test_split(features, 
                             labels, 
                             test_size=0.2, 
-                            random_state=31)
+                            random_state=RANDOM_SEED)
+
 
 def generate_past_season_ids(past_seasons):
     """
