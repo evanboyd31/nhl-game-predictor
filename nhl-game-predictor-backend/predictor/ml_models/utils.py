@@ -1,6 +1,7 @@
 from games.models import Game
 import os
 import django
+import pandas as pd
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
@@ -147,3 +148,23 @@ class GameDataFrameEntry:
             # label is a simple binary decision of did the home team win or not
             "home_team_win": self.home_team_win,
         }
+    
+
+def create_seasons_dataframe(past_seasons):
+    """
+    creates a pandas dataframe of all games that took place in the
+    list of seasons in past_seasons array of season IDs
+    """
+    # fetch all Game records for the specified past seasons
+    games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
+
+    # create GameDataFrameEntry instances for each game
+    game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
+
+    # convert the list of entries to a list of dictionaries
+    game_data_dicts = [entry.to_dict() for entry in game_dataframe_entries]
+
+    # create a DataFrame from the list of dictionaries
+    game_data_df = pd.DataFrame(game_data_dicts)
+
+    return game_data_df

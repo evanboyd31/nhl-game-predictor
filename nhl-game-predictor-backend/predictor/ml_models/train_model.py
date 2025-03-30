@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
+from utils import create_seasons_dataframe
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -38,25 +39,6 @@ def generate_past_season_ids(past_seasons):
         season_ids.append(int(season_id))
     
     return season_ids
-
-def create_seasons_dataframe(past_seasons):
-    """
-    creates a pandas dataframe of all games that took place in the
-    list of seasons in past_seasons array of season IDs
-    """
-    # fetch all Game records for the specified past seasons
-    games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
-
-    # create GameDataFrameEntry instances for each game
-    game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
-
-    # convert the list of entries to a list of dictionaries
-    game_data_dicts = [entry.to_dict() for entry in game_dataframe_entries]
-
-    # create a DataFrame from the list of dictionaries
-    game_data_df = pd.DataFrame(game_data_dicts)
-
-    return game_data_df
 
 def create_training_data(game_data_df):
     """
