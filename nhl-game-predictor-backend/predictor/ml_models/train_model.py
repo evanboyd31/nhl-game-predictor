@@ -9,10 +9,9 @@ from django.utils import timezone
 import pickle
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
-from utils import create_seasons_dataframe
+from utils import create_seasons_dataframe, create_training_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -39,21 +38,6 @@ def generate_past_season_ids(past_seasons):
         season_ids.append(int(season_id))
     
     return season_ids
-
-def create_training_data(game_data_df):
-    """
-    splits a pandas dataframe of game data into training and validation sets
-    as required by the Random Forest model
-    """
-    # split features and labels from dataframe
-    features = game_data_df.drop(columns=['home_team_win'])
-    labels = game_data_df['home_team_win']
-
-    # split of training and validation data
-    return train_test_split(features, 
-                            labels, 
-                            test_size=0.2, 
-                            random_state=31)
 
 @transaction.atomic
 def train_random_forest(past_seasons):
