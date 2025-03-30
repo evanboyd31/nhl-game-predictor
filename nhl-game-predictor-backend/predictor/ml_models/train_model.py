@@ -1,16 +1,12 @@
 import os
 import django
-import pandas as pd
 from django.db import transaction
 from django.db.models import Max
 from predictor.models import PredictionModel
-from games.models import Game
 from django.utils import timezone
 import pickle
-import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from predictor.ml_models.utils import GameDataFrameEntry
 from utils import create_seasons_dataframe, create_training_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
