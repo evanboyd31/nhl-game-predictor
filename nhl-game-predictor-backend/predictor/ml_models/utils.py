@@ -1,6 +1,7 @@
 from games.models import Game
 import os
 import django
+from django.utils import timezone
 import pandas as pd
 from sklearn.model_selection import train_test_split
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
@@ -184,3 +185,26 @@ def create_training_data(game_data_df):
                             labels, 
                             test_size=0.2, 
                             random_state=31)
+
+def generate_past_season_ids(past_seasons):
+    """
+    generates a list of the n past season IDs of the form 20XX20XX
+    as required by the official NHL API
+    """
+    current_date = timezone.localdate()
+    current_month = current_date.month
+    current_year = current_date.year
+    
+    if current_month >= 7:  # July or later
+        current_season_start_year = current_year
+    else:  # January to June
+        current_season_start_year = current_year - 1
+
+    season_ids = []
+    
+    for i in range(past_seasons):
+        year_start = current_season_start_year - (i + 1)
+        season_id = f"{year_start}{year_start + 1}"
+        season_ids.append(int(season_id))
+    
+    return season_ids

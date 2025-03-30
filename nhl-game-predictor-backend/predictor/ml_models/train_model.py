@@ -3,7 +3,6 @@ import django
 from django.db import transaction
 from django.db.models import Max
 from predictor.models import PredictionModel
-from django.utils import timezone
 import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -11,29 +10,6 @@ from utils import create_seasons_dataframe, create_training_data
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
-
-def generate_past_season_ids(past_seasons):
-    """
-    generates a list of the n past season IDs of the form 20XX20XX
-    as required by the official NHL API
-    """
-    current_date = timezone.localdate()
-    current_month = current_date.month
-    current_year = current_date.year
-    
-    if current_month >= 7:  # July or later
-        current_season_start_year = current_year
-    else:  # January to June
-        current_season_start_year = current_year - 1
-
-    season_ids = []
-    
-    for i in range(past_seasons):
-        year_start = current_season_start_year - (i + 1)
-        season_id = f"{year_start}{year_start + 1}"
-        season_ids.append(int(season_id))
-    
-    return season_ids
 
 @transaction.atomic
 def train_random_forest(past_seasons):
