@@ -26,7 +26,7 @@ class GameDataFrameEntry:
         # general game data
         self.home_team = game.home_team.franchise.pk
         self.away_team = game.away_team.franchise.pk
-        self.game_type = game_json.get("gameTypeId", 1)
+        self.game_type = int(game_json.get("gameType", 1) or 1)
 
         self.game_month = game.game_date.month
         self.game_day_of_week = game.game_date.weekday()
@@ -56,7 +56,7 @@ class GameDataFrameEntry:
         self.home_team_home_ot_loss_percentage = home_team_data_json.get("homeOtLosses", 0) / home_games_played 
         self.home_team_home_goals_for_per_game = home_team_data_json.get("homeGoalsFor", 0) / home_games_played 
         self.home_team_home_goals_against_per_game = home_team_data_json.get("homeGoalsAgainst", 0) / home_games_played 
-        self.home_team_home_goal_differential_per_game = home_team_data_json.get("homeGoalDifferent", 0) / home_games_played
+        self.home_team_home_goal_differential_per_game = home_team_data_json.get("homeGoalDifferential", 0) / home_games_played
 
 
         # away team data (using rates)
