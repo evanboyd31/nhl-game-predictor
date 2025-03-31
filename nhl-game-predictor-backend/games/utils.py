@@ -40,7 +40,7 @@ feature importances in the React frontend
 cleaned_feature_names_dictionary = {
     "home_team": lambda game: f"The {game.home_team.name} are the home team",
     "away_team": lambda game: f"The {game.away_team.name} are the away team",
-    "game_type": lambda game: "The game is a regular season game" if game.game_json.get("gameTypeId") == 1 else "The game is a playoff game",
+    "game_type": lambda game: "The game is a regular season game" if game.game_json.get("gameType") == 1 else "The game is a playoff game",
     "game_month": lambda game: f"The game is in {month_dictionary[game.game_date.month]}",
     "game_day_of_week": lambda game: f"The game is on a {weekday_dictionary[game.game_date.weekday()]}",
 
