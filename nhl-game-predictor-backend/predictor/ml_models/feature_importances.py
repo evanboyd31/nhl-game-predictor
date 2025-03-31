@@ -40,4 +40,30 @@ def compute_cosine_similarities(past_seasons : list):
   plt.gca().invert_yaxis()
 
   plt.savefig("predictor/ml_models/plots/cosine_similarity_plot.png", dpi=300, bbox_inches='tight')
+
+  # find the features to remove based on the mean - stddev of absolute value cosine similarities
+  absolute_regression_coefficients = [(name, abs(wd)) for name, wd in sorted_regression_coefficients]
+  absolute_regression_coefficients.sort(key=lambda x: x[1],
+                                        reverse=True)
+  mean_absolute_regression_coefficient = np.mean(np.array([wd for _, wd in absolute_regression_coefficients]))
+  stddev_absolute_regression_coefficient = np.std(np.array([wd for _, wd in absolute_regression_coefficients]))
+  threshold = mean_absolute_regression_coefficient - stddev_absolute_regression_coefficient
+
+  plt.figure(figsize=(12, 6))
+  plt.bar([name for name, _ in absolute_regression_coefficients],
+          [wd for _, wd in absolute_regression_coefficients],
+          color="#ee983a")
+  plt.axhline(y=threshold,
+              color="black",
+              label="Mean - Stddev")
+  plt.xlabel("Feature Name")
+  plt.ylabel("Absolute Cosine Similarity With Home Team Win")
+  plt.title("Absolute Cosine Similarity With Home Team Win")
+  plt.xticks(rotation=90)
+  plt.legend()
+
+  plt.savefig("predictor/ml_models/plots/absolute_cosine_similarity_plot.png", dpi=300, bbox_inches='tight')
+
+  features_to_remove = [name for name, wd in absolute_regression_coefficients if wd < threshold]
+  print(f"Names of features to remove: {features_to_remove}")
   
