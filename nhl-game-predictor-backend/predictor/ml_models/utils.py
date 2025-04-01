@@ -179,7 +179,7 @@ def create_features_and_labels(game_data_df):
     return features, labels
 
 
-def create_training_data(game_data_df):
+def create_training_data(game_data_df, test_size=0.2):
     """
     splits a pandas dataframe of game data into training and validation sets
     as required by the Random Forest model
@@ -190,7 +190,7 @@ def create_training_data(game_data_df):
     # split of training and validation data
     return train_test_split(features, 
                             labels, 
-                            test_size=0.2, 
+                            test_size=test_size, 
                             random_state=RANDOM_SEED)
 
 
