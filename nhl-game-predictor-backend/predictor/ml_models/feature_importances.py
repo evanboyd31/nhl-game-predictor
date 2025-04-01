@@ -72,5 +72,5 @@ def remove_irrelevant_features(past_seasons : list):
   plt.savefig("predictor/ml_models/plots/absolute_cosine_similarity_plot.png", dpi=300, bbox_inches='tight')
 
   features_to_remove = [name for name, wd in absolute_cosine_similarities if wd < threshold]
-  return features.remove(features_to_remove)
+  return pd.concat([features.drop(features_to_remove, axis=1), labels], axis=1)
   
