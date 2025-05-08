@@ -1,5 +1,4 @@
 import httpx
-import time
 
 URL = "https://nhl-game-predictor-backend.onrender.com/api/keep-active/"
 
