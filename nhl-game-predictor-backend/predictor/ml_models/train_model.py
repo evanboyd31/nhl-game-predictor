@@ -5,11 +5,31 @@ from django.db.models import Max
 from predictor.models import PredictionModel
 import pickle
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
 from predictor.ml_models.utils import create_seasons_dataframe, create_training_data
+from predictor.ml_models.feature_importances import remove_irrelevant_features
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
+
+@transaction.atomic
+def train_logistic_regression(past_seasons):
+    game_data_df = remove_irrelevant_features(past_seasons=past_seasons)
+
+    training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
+
+    logistic_regression = LogisticRegression()
+    logistic_regression.fit(training_features, training_labels)
+
+    predicted_probabilities = logistic_regression.predict_proba(testing_features)[:, 1]
+    predicted_labels = logistic_regression.predict(testing_features)
+
+    accuracy = accuracy_score(testing_labels, predicted_labels)
+    roc_auc = roc_auc_score(testing_labels, predicted_probabilities)
+
+    print(f"Accuracy: {accuracy}")
+    print(f"AUC-ROC Score: {roc_auc}")
 
 @transaction.atomic
 def train_random_forest(past_seasons):
