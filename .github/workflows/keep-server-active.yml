@@ -2,8 +2,9 @@ name: Keep Server Active
 
 on:
   schedule:
-    # ping every minute
+    # run job once each minute
     - cron: "*/1 * * * *"
+  workflow_dispatch:
 
 jobs:
   keep-server-active:
@@ -24,4 +25,4 @@ jobs:
           pip install httpx
 
       - name: Run keep_server_active.py
-        run: python ../../nhl-game-predictor-backend/keep_server_active.py
+        run: python nhl-game-predictor-backend/keep_server_active.py

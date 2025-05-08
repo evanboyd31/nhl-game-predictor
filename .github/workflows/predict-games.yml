@@ -2,7 +2,10 @@ name: Predict Games
 
 on:
   schedule:
+    # run job every 30 minutes
     - cron: "*/30 * * * *"
+  workflow_dispatch:
+
 jobs:
   predict-games:
     runs-on: ubuntu-latest
@@ -24,4 +27,4 @@ jobs:
       - name: Run predict_games.py
         env:
           PREDICT_GAMES_TODAY_ACCESS_TOKEN: ${{ secrets.PREDICT_GAMES_TODAY_ACCESS_TOKEN }}
-        run: python ../../nhl-game-predictor-backend/predict_games.py
+        run: python nhl-game-predictor-backend/predict_games.py
