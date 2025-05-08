@@ -2,7 +2,8 @@ name: Keep Server Active
 
 on:
   schedule:
-    - cron: "*/1 * * * *" # This cron expression means every minute
+    # ping every minute
+    - cron: "*/1 * * * *"
 
 jobs:
   keep-server-active:
