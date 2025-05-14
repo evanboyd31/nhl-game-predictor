@@ -7,7 +7,7 @@ from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
-from .permissions import PredictGamesTodayPermission
+from .permissions import KeepActivePermission, PredictGamesTodayPermission
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -137,10 +137,15 @@ class PredictGamesTodayView(APIView):
     
 class KeepActiveView(APIView):
     """
-    called every 15 minutes so the free render service does not spin down
+    called frequently so the free Render and Supabase
+    instances do not spin down
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [KeepActivePermission]
 
     def get(self, request):
+        # query for a game to keep Supabase instance active in addition to Render
+        _ = Game.objects.order_by("id").first()
+
+        # Render is kept active by responding to this GET request
         return Response({"status": "Server is active"}, status=200)

@@ -161,3 +161,6 @@ NHL_API_BASE_URL = "https://api-web.nhle.com/v1/"
 
 # access token for calling PredictGamesTodayView REST API endpoint
 PREDICT_GAMES_TODAY_ACCESS_TOKEN = os.getenv("PREDICT_GAMES_TODAY_ACCESS_TOKEN", "")
+
+# access token for calling KeepActiveView REST API endpoint
+KEEP_ACTIVE_ACCESS_TOKEN = os.getenv("KEEP_ACTIVE_ACCESS_TOKEN", "")
