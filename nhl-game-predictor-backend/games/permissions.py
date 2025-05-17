@@ -20,3 +20,13 @@ class KeepActivePermission(BasePermission):
     def has_permission(self, request, view):
         token = request.headers.get("KEEP-ACTIVE-TOKEN")
         return token == settings.KEEP_ACTIVE_ACCESS_TOKEN
+    
+class FetchGamesFromNHLAPIByDatePermission(BasePermission):
+    """
+    custom permission class to ensure that only the keep_servers_active.py script
+    can call the KeepActiveView API endpoint
+    """
+
+    def has_permission(self, request, view):
+        token = request.headers.get("FETCH-GAMES-TOKEN")
+        return token == settings.FETCH_GAMES_TOKEN
