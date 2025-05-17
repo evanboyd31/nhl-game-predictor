@@ -22,7 +22,7 @@ class PredictGamesTodayPermission(TokenBasedPermission):
     token_header_name = "PREDICT-GAMES-TODAY-TOKEN"
     expected_token_value = settings.PREDICT_GAMES_TODAY_ACCESS_TOKEN
     
-class KeepActivePermission(BasePermission):
+class KeepActivePermission(TokenBasedPermission):
     """
     custom permission class to ensure that only the keep_servers_active.py script
     can call the KeepActiveView API endpoint
@@ -31,7 +31,7 @@ class KeepActivePermission(BasePermission):
     token_header_name = "KEEP-ACTIVE-TOKEN"
     expected_token_value = settings.KEEP_ACTIVE_ACCESS_TOKEN
     
-class FetchGamesFromNHLAPIByDatePermission(BasePermission):
+class FetchGamesFromNHLAPIByDatePermission(TokenBasedPermission):
     """
     custom permission class to ensure that only the keep_servers_active.py script
     can call the KeepActiveView API endpoint
