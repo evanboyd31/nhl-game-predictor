@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from games.views import GameDetailView, GameListByDateView, GamePredictionByGameIdView, GamePredictionListByDateView, KeepActiveView, PredictGamesTodayView
+from games.views import FetchGamesFromNHLAPIByDateView, GameDetailView, GameListByDateView, GamePredictionByGameIdView, GamePredictionListByDateView, KeepActiveView, PredictGamesTodayView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/game-predictions/date/', GamePredictionListByDateView.as_view(), name='game-prediction-list-by-date'),
     path('api/game-predictions/by-game/<int:game_id>/', GamePredictionByGameIdView.as_view(), name='game-prediction-by-game-id'),
     path('api/predict-games-today/', PredictGamesTodayView.as_view(), name='predict-games-today'),
-    path('api/keep-active/', KeepActiveView.as_view(), name='keep-active')
+    path('api/keep-active/', KeepActiveView.as_view(), name='keep-active'),
+    path('api/games/fetch-from-nhl-api/', FetchGamesFromNHLAPIByDateView.as_view(), name='fetch-games-from-nhl-api-by-date')
 ]
