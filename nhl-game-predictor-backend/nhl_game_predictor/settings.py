@@ -164,3 +164,6 @@ PREDICT_GAMES_TODAY_ACCESS_TOKEN = os.getenv("PREDICT_GAMES_TODAY_ACCESS_TOKEN",
 
 # access token for calling KeepActiveView REST API endpoint
 KEEP_ACTIVE_ACCESS_TOKEN = os.getenv("KEEP_ACTIVE_ACCESS_TOKEN", "")
+
+# access token for calling KeepActiveView REST API endpoint
+FETCH_GAMES_TOKEN = os.getenv("FETCH_GAMES_TOKEN", "")
