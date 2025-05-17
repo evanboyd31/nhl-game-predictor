@@ -7,7 +7,7 @@ from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
-from .permissions import KeepActivePermission, PredictGamesTodayPermission
+from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission
 from .data_loader import fetch_games_for_date
 
 class GameDetailView(generics.RetrieveAPIView):
@@ -157,7 +157,9 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
     and store in the DB as Game objects. TeamData objects
     are also created, if the provided date is today or in the past
     """
-
+    # only callers with a specific API token can call this endpoint to predict games
+    # so the RAM limit of the Render backend server is not exceeded
+    permission_classes = [FetchGamesFromNHLAPIByDatePermission]
     serializer_class = GameSerializer
     _games = None
 
@@ -184,7 +186,7 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
         date = self.get_date()
         games = fetch_games_for_date(date=date,
                                      get_team_data=True)
-        
+
         # there are no games scheduled on the date, so raise an error saying so
         if len(games) == 0:
             raise NotFound("There are no NHL games scheduled today.")
