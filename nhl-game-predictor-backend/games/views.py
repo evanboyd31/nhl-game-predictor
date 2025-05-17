@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
 from .permissions import KeepActivePermission, PredictGamesTodayPermission
+from .data_loader import fetch_games_for_date
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -149,3 +150,44 @@ class KeepActiveView(APIView):
 
         # Render is kept active by responding to this GET request
         return Response({"status": "Server is active"}, status=200)
+    
+class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
+    """
+    REST API to fetch games on a given date from the NHL API
+    and store in the DB as Game objects. TeamData objects
+    are also created, if the provided date is today or in the past
+    """
+
+    serializer_class = GameSerializer
+    _games = None
+
+    def get_date(self):
+        """
+        extracts the date out of the query parameters,
+        and throws a relevant error if it is not provided
+        """
+        date_str = self.request.query_params.get('date')
+        # caller must provide a date to find game predictions
+        if not date_str:
+            raise ParseError("A date must be provided in the format 'YYYY-MM-DD'.")
+        # ensure date is in correct format
+        try:
+            date = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
+            return date
+        except ValueError:
+            raise ParseError("Invalid date format. Use 'YYYY-MM-DD'.")
+        
+    def get_queryset(self):
+        if self._games is not None:
+            return self._games
+        
+        date = self.get_date()
+        games = fetch_games_for_date(date=date,
+                                     get_team_data=True)
+        
+        # there are no games scheduled on the date, so raise an error saying so
+        if len(games) == 0:
+            raise NotFound("There are no NHL games scheduled today.")
+
+        self._games = games
+        return games
