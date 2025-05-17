@@ -75,7 +75,8 @@ def fetch_games_for_date(date, get_team_data=True):
     Returns True in the case that there are games on the given date,
     False otherwise.
     """
-    schedule_url = f"https://api-web.nhle.com/v1/schedule/{date.strftime("%Y-%m-%d")}"
+    date_string = date.strftime("%Y-%m-%d")
+    schedule_url = f"https://api-web.nhle.com/v1/schedule/{date_string}"
     schedule_response = httpx.get(schedule_url)
     response_json = schedule_response.json()
     games_for_date_json = response_json.get("gameWeek")[0].get("games", [])
@@ -85,7 +86,7 @@ def fetch_games_for_date(date, get_team_data=True):
     # iterate over all games
     for game_json in games_for_date_json:
         game, home_team_data, away_team_data = convert_game_json_to_game_data_objects(game_json=game_json,
-                                                                                      date_string=response_json.get("gameWeek")[0].get("date"),
+                                                                                      date_string=date_string,
                                                                                       get_team_data=True)
         if game is not None:
             games_to_create.append(game)
