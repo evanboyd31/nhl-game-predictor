@@ -1,3 +1,5 @@
+from games.models import Game
+
 """
 provided an integer in the range [1, 12], this dictionary
 maps the integer to the corresponding month name
@@ -93,3 +95,12 @@ cleaned_feature_names_dictionary = {
     "home_team_win": lambda game: "The home team won" if game.home_team_win else "The home team lost",
 }
 
+def get_current_season_id():
+    """
+    this function returns the season id of the current NHL season
+    it assumes that the games stored in the database are up to date
+    """
+
+    latest_game = Game.objects.latest("game_date")
+    latest_game_season = latest_game.game_json.get("season")
+    return latest_game_season
