@@ -106,15 +106,20 @@ def get_current_season_id():
     latest_game_season = latest_game.game_json.get("season")
     return latest_game_season
 
-def get_game_type_games_for_team_this_season(team_id : int, game_type : int):
+def get_game_type_games_for_team_and_before_date_this_season(team_id : int, date, game_type : int):
     current_season_id = get_current_season_id()
     games = Game.objects.filter(Q(home_team__id=team_id) | Q(away_team__id=team_id),
+                                game_date__lt=date,
                                 game_json__season=current_season_id,
                                 game_json__gameType=game_type)
     return games
 
-def get_preseason_games_for_team_this_season(team_id : int):
-    return get_game_type_games_for_team_this_season(team_id=team_id, game_type=Game.PRESEASON)
+def get_preseason_games_for_team_and_before_date_this_season(team_id : int, date):
+    return get_game_type_games_for_team_and_before_date_this_season(team_id=team_id,
+                                                                    date=date,
+                                                                    game_type=Game.PRESEASON)
 
-def get_playoff_games_for_team_this_season(team_id : int):
-    return get_game_type_games_for_team_this_season(team_id=team_id, game_type=Game.PLAYOFFS)
+def get_playoff_games_for_team_and_before_date_this_season(team_id : int, date):
+    return get_game_type_games_for_team_and_before_date_this_season(team_id=team_id, 
+                                                                    date=date,
+                                                                    game_type=Game.PLAYOFFS)
