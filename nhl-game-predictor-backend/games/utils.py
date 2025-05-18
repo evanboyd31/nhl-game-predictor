@@ -112,3 +112,10 @@ def get_preseason_games_for_team_this_season(team_id : int):
                                                    game_json__season=current_season_id,
                                                    game_json__gameType=Game.REGULAR_SEASON)
     return preseason_games_for_team
+
+def get_playoff_games_for_team_this_season(team_id : int):
+    current_season_id = get_current_season_id()
+    playoff_games_for_team = Game.objects.filter(Q(home_team__id=team_id) | Q(away_team__id=team_id),
+                                                 game_json__season=current_season_id,
+                                                 game_json__gameType=Game.PLAYOFFS)
+    return playoff_games_for_team
