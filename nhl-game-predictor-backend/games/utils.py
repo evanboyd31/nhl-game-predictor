@@ -1,4 +1,5 @@
 from games.models import Game
+from django.db.models import Q
 
 """
 provided an integer in the range [1, 12], this dictionary
@@ -104,3 +105,10 @@ def get_current_season_id():
     latest_game = Game.objects.latest("game_date")
     latest_game_season = latest_game.game_json.get("season")
     return latest_game_season
+
+def get_preseason_games_for_team_this_season(team_id : int):
+    current_season_id = get_current_season_id()
+    preseason_games_for_team = Game.objects.filter(Q(home_team__id=team_id) | Q(away_team__id=team_id),
+                                                   game_json__season=current_season_id,
+                                                   game_json__gameType=Game.REGULAR_SEASON)
+    return preseason_games_for_team
