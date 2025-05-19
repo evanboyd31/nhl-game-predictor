@@ -12,6 +12,101 @@ class GameDataFrameEntry:
     a Random Forest model
     """
 
+    def __init__(
+        self,
+        home_team,
+        away_team,
+        game_type,
+        game_month,
+        game_day_of_week,
+        home_team_win_percentage,
+        home_team_loss_percentage,
+        home_team_ot_loss_percentage,
+        home_team_goals_for_per_game,
+        home_team_goals_against_per_game,
+        home_team_goal_differential_per_game,
+        home_team_l10_win_percentage,
+        home_team_l10_loss_percentage,
+        home_team_l10_ot_losses,
+        home_team_l10_goals_for_per_game,
+        home_team_l10_goals_against_per_game,
+        home_team_l10_goal_differential_per_game,
+        home_team_home_win_percentage,
+        home_team_home_loss_percentage,
+        home_team_home_ot_loss_percentage,
+        home_team_home_goals_for_per_game,
+        home_team_home_goals_against_per_game,
+        home_team_home_goal_differential_per_game,
+        away_team_win_percentage,
+        away_team_loss_percentage,
+        away_team_ot_loss_percentage,
+        away_team_goals_for_per_game,
+        away_team_goals_against_per_game,
+        away_team_goal_differential_per_game,
+        away_team_l10_win_percentage,
+        away_team_l10_loss_percentage,
+        away_team_l10_ot_losses,
+        away_team_l10_goals_for_per_game,
+        away_team_l10_goals_against_per_game,
+        away_team_l10_goal_differential_per_game,
+        away_team_road_win_percentage,
+        away_team_road_loss_percentage,
+        away_team_road_ot_loss_percentage,
+        away_team_road_goals_for_per_game,
+        away_team_road_goals_against_per_game,
+        away_team_road_goal_differential_per_game,
+        home_team_win
+    ):
+        self.home_team = home_team
+        self.away_team = away_team
+        self.game_type = game_type
+        self.game_month = game_month
+        self.game_day_of_week = game_day_of_week
+
+        self.home_team_win_percentage = home_team_win_percentage
+        self.home_team_loss_percentage = home_team_loss_percentage
+        self.home_team_ot_loss_percentage = home_team_ot_loss_percentage
+        self.home_team_goals_for_per_game = home_team_goals_for_per_game
+        self.home_team_goals_against_per_game = home_team_goals_against_per_game
+        self.home_team_goal_differential_per_game = home_team_goal_differential_per_game
+
+        self.home_team_l10_win_percentage = home_team_l10_win_percentage
+        self.home_team_l10_loss_percentage = home_team_l10_loss_percentage
+        self.home_team_l10_ot_losses = home_team_l10_ot_losses
+        self.home_team_l10_goals_for_per_game = home_team_l10_goals_for_per_game
+        self.home_team_l10_goals_against_per_game = home_team_l10_goals_against_per_game
+        self.home_team_l10_goal_differential_per_game = home_team_l10_goal_differential_per_game
+
+        self.home_team_home_win_percentage = home_team_home_win_percentage
+        self.home_team_home_loss_percentage = home_team_home_loss_percentage
+        self.home_team_home_ot_loss_percentage = home_team_home_ot_loss_percentage
+        self.home_team_home_goals_for_per_game = home_team_home_goals_for_per_game
+        self.home_team_home_goals_against_per_game = home_team_home_goals_against_per_game
+        self.home_team_home_goal_differential_per_game = home_team_home_goal_differential_per_game
+
+        self.away_team_win_percentage = away_team_win_percentage
+        self.away_team_loss_percentage = away_team_loss_percentage
+        self.away_team_ot_loss_percentage = away_team_ot_loss_percentage
+        self.away_team_goals_for_per_game = away_team_goals_for_per_game
+        self.away_team_goals_against_per_game = away_team_goals_against_per_game
+        self.away_team_goal_differential_per_game = away_team_goal_differential_per_game
+
+        self.away_team_l10_win_percentage = away_team_l10_win_percentage
+        self.away_team_l10_loss_percentage = away_team_l10_loss_percentage
+        self.away_team_l10_ot_losses = away_team_l10_ot_losses
+        self.away_team_l10_goals_for_per_game = away_team_l10_goals_for_per_game
+        self.away_team_l10_goals_against_per_game = away_team_l10_goals_against_per_game
+        self.away_team_l10_goal_differential_per_game = away_team_l10_goal_differential_per_game
+
+        self.away_team_road_win_percentage = away_team_road_win_percentage
+        self.away_team_road_loss_percentage = away_team_road_loss_percentage
+        self.away_team_road_ot_loss_percentage = away_team_road_ot_loss_percentage
+        self.away_team_road_goals_for_per_game = away_team_road_goals_for_per_game
+        self.away_team_road_goals_against_per_game = away_team_road_goals_against_per_game
+        self.away_team_road_goal_differential_per_game = away_team_road_goal_differential_per_game
+
+        self.home_team_win = home_team_win
+
     def __init__(self, game: Game):
         game_json = game.game_json
         home_team_data = game.home_team_data
