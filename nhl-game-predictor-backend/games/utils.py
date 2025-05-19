@@ -260,3 +260,121 @@ def compute_stats_over_games_queryset(games_queryset : QuerySet[Game], team : Te
                 away_goals_for_per_game,
                 away_goals_against_per_game,
                 away_goal_differential_per_game)
+    
+def create_game_data_frame_entry_for_non_regular_season_game(game : Game):
+    
+    # case 1: preseason. we isolate performance in the preseason
+    if game.game_json.get("gameType") == Game.PRESEASON:
+        # get team ids
+
+        game_data_frame_entry = create_game_data_frame_entry_for_preseason_game(game=game)
+    # case 2: playoffs. we consider performance in the regular season
+    elif game.game_json.get("gameType") == Game.PLAYOFFS:
+        game_data_frame_entry = None
+    
+    return game_data_frame_entry
+
+def create_game_data_frame_entry_for_preseason_game(game : Game):
+    game_date = game.game_date
+    home_team_id = game.home_team.pk
+    away_team_id = game.away_team.pk
+
+    # retrive the preseason games prior to the date of the game
+    home_team_preseason_games = get_preseason_games_for_team_and_before_date_this_season(team_id=home_team_id,
+                                                                                            date=game_date)
+    away_team_preseason_games = get_preseason_games_for_team_and_before_date_this_season(team_id=away_team_id,
+                                                                                            date=game_date)
+    # create features using helper function
+    home_team = game.home_team
+    away_team = game.away_team
+    game_type = Game.PRESEASON
+    game_month = game_date.month
+    game_day_of_week = game_date.weekday
+
+    (home_team_win_percentage,
+     home_team_loss_percentage,
+     home_team_ot_loss_percentage,
+     home_team_goals_for_per_game,
+     home_team_goals_against_per_game,
+     home_team_goal_differential_per_game,
+     home_team_l10_win_percentage,
+     home_team_l10_loss_percentage,
+     home_team_l10_ot_losses,
+     home_team_l10_goals_for_per_game,
+     home_team_l10_goals_against_per_game,
+     home_team_l10_goal_differential_per_game,
+     home_team_home_win_percentage,
+     home_team_home_loss_percentage,
+     home_team_home_ot_loss_percentage,
+     home_team_home_goals_for_per_game,
+     home_team_home_goals_against_per_game,
+     home_team_home_goal_differential_per_game) = compute_stats_over_games_queryset(games_queryset=home_team_preseason_games,
+                                                                                    team=home_team,
+                                                                                    is_home_team=True)
+    
+    (away_team_win_percentage,
+     away_team_loss_percentage,
+     away_team_ot_loss_percentage,
+     away_team_goals_for_per_game,
+     away_team_goals_against_per_game,
+     away_team_goal_differential_per_game,
+     away_team_l10_win_percentage,
+     away_team_l10_loss_percentage,
+     away_team_l10_ot_losses,
+     away_team_l10_goals_for_per_game,
+     away_team_l10_goals_against_per_game,
+     away_team_l10_goal_differential_per_game,
+     away_team_road_win_percentage,
+     away_team_road_loss_percentage,
+     away_team_road_ot_loss_percentage,
+     away_team_road_goals_for_per_game,
+     away_team_road_goals_against_per_game,
+     away_team_road_goal_differential_per_game) = compute_stats_over_games_queryset(games_queryset=away_team_preseason_games,
+                                                                                    team=away_team,
+                                                                                    is_home_team=False)
+    home_team_win = 1 if game.winning_team == game.home_team else 0
+    
+    game_data_frame_entry = GameDataFrameEntry(home_team,
+                                               away_team,
+                                               game_type,
+                                               game_month,
+                                               game_day_of_week,
+                                               home_team_win_percentage,
+                                               home_team_loss_percentage,
+                                               home_team_ot_loss_percentage,
+                                               home_team_goals_for_per_game,
+                                               home_team_goals_against_per_game,
+                                               home_team_goal_differential_per_game,
+                                               home_team_l10_win_percentage,
+                                               home_team_l10_loss_percentage,
+                                               home_team_l10_ot_losses,
+                                               home_team_l10_goals_for_per_game,
+                                               home_team_l10_goals_against_per_game,
+                                               home_team_l10_goal_differential_per_game,
+                                               home_team_home_win_percentage,
+                                               home_team_home_loss_percentage,
+                                               home_team_home_ot_loss_percentage,
+                                               home_team_home_goals_for_per_game,
+                                               home_team_home_goals_against_per_game,
+                                               home_team_home_goal_differential_per_game,
+                                               away_team_win_percentage,
+                                               away_team_loss_percentage,
+                                               away_team_ot_loss_percentage,
+                                               away_team_goals_for_per_game,
+                                               away_team_goals_against_per_game,
+                                               away_team_goal_differential_per_game,
+                                               away_team_l10_win_percentage,
+                                               away_team_l10_loss_percentage,
+                                               away_team_l10_ot_losses,
+                                               away_team_l10_goals_for_per_game,
+                                               away_team_l10_goals_against_per_game,
+                                               away_team_l10_goal_differential_per_game,
+                                               away_team_road_win_percentage,
+                                               away_team_road_loss_percentage,
+                                               away_team_road_ot_loss_percentage,
+                                               away_team_road_goals_for_per_game,
+                                               away_team_road_goals_against_per_game,
+                                               away_team_road_goal_differential_per_game,
+                                               home_team_win)
+    
+    return game_data_frame_entry
