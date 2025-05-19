@@ -1,5 +1,6 @@
-from games.models import Game
-from django.db.models import Q
+from games.models import Game, Team
+from django.db.models import Q, QuerySet
+from predictor.ml_models.utils import GameDataFrameEntry
 
 """
 provided an integer in the range [1, 12], this dictionary
@@ -123,3 +124,139 @@ def get_playoff_games_for_team_and_before_date_this_season(team_id : int, date):
     return get_game_type_games_for_team_and_before_date_this_season(team_id=team_id, 
                                                                     date=date,
                                                                     game_type=Game.PLAYOFFS)
+
+
+def compute_stats_over_games_queryset(games_queryset : QuerySet[Game], team : Team, is_home_team : bool):
+    if not games_queryset.exists():
+        win_percentage = 0
+        loss_percentage = 0
+        ot_loss_percentage = 0
+        goals_for_per_game = 0
+        goals_against_per_game = 0
+        goal_differential_per_game = 0
+
+        l10_win_percentage = 0
+        l10_loss_percentage = 0
+        l10_ot_losses = 0
+        l10_goals_for_per_game = 0
+        l10_goals_against_per_game = 0
+        l10_goal_differential_per_game = 0
+
+        if is_home_team:
+            home_win_percentage = 0
+            home_loss_percentage = 0
+            home_ot_loss_percentage = 0
+            home_goals_for_per_game = 0
+            home_goals_against_per_game = 0
+            home_goal_differential_per_game = 0
+        else:
+            away_win_percentage = 0
+            away_loss_percentage = 0
+            away_ot_loss_percentage = 0
+            away_goals_for_per_game = 0
+            away_goals_against_per_game = 0
+            away_goal_differential_per_game = 0
+    else:
+        total_games = games_queryset.count()
+        total_home_games = games_queryset.filter(home_team=team).count()
+        total_away_games = games_queryset.filter(away_team=team).count()
+        for game in games_queryset:
+            wins += 1 if game.winning_team == team else 0
+            losses += 1 if game.winning_team != team else 0
+            ot_losses += 1 if game.game_json.get("gameOutcome").get("lastPeriodType") == "OT" and game.winning_team != team else 0
+            goals_for += game.game_json.get("homeTeam").get("score") if game.home_team == team else game.game_json.get("awayTeam").get("score")
+            goals_against += game.game_json.get("homeTeam").get("score") if game.away_team == team else game.game_json.get("awayTeam").get("score")
+            goal_differential += game.game_json.get("homeTeam").get("score") - game.game_json.get("awayTeam").get("score") if game.home_team == team else game.game_json.get("awayTeam").get("score") - game.game_json.get("homeTeam").get("score")
+
+            if is_home_team:
+                home_wins += 1 if game.winning_team == team and game.home_team == team else 0
+                home_losses += 1 if game.winning_team != team and game.home_team == team else 0
+                home_ot_losses += 1 if game.game_json.get("gameOutcome").get("lastPeriodType") == "OT" and game.winning_team != team and game.home_team == team else 0
+                home_goals_for += game.game_json.get("homeTeam").get("score") if game.home_team == team else 0
+                home_goals_against += game.game_json.get("awayTeam").get("score") if game.home_team == team else 0
+                home_goal_differential += game.game_json.get("homeTeam").get("score") - game.game_json.get("awayTeam").get("score") if game.home_team == team else 0
+            else:
+                away_wins += 1 if game.winning_team == team and game.away_team == team else 0
+                away_losses += 1 if game.winning_team != team and game.away_team == team else 0
+                away_ot_losses += 1 if game.game_json.get("gameOutcome").get("lastPeriodType") == "OT" and game.winning_team != team and game.away_team == team else 0
+                away_goals_for += game.game_json.get("awayTeam").get("score") if game.away_team == team else 0
+                away_goals_against += game.game_json.get("homeTeam").get("score") if game.away_team == team else 0
+                away_goal_differential += game.game_json.get("awayTeam").get("score") - game.game_json.get("homeTeam").get("score") if game.away_team == team else 0
+
+        last_ten_games = games_queryset.order_by("game_date")[:10]
+        for game in last_ten_games:
+            l10_wins += 1 if game.winning_team == team else 0
+            l10_losses += 1 if game.winning_team != team else 0
+            l10_ot_losses += 1 if game.game_json.get("gameOutcome").get("lastPeriodType") == "OT" and game.winning_team != team else 0
+            l10_goals_for += game.game_json.get("homeTeam").get("score") if game.home_team == team else game.game_json.get("awayTeam").get("score")
+            l10_goals_against += game.game_json.get("homeTeam").get("score") if game.away_team == team else game.game_json.get("awayTeam").get("score")
+            l10_goal_differential += game.game_json.get("homeTeam").get("score") - game.game_json.get("awayTeam").get("score") if game.home_team == team else game.game_json.get("awayTeam").get("score") - game.game_json.get("homeTeam").get("score")
+
+        win_percentage = wins / total_games
+        loss_percentage = losses / total_games
+        ot_loss_percentage = ot_losses / total_games
+        goals_for_per_game = goals_for / total_games
+        goals_against_per_game = goals_against / total_games
+        goal_differential_per_game = goal_differential / total_games
+
+        l10_win_percentage = l10_wins / 10
+        l10_loss_percentage = l10_losses / 10
+        l10_ot_losses = l10_ot_losses / 10
+        l10_goals_for_per_game = l10_goals_for / 10
+        l10_goals_against_per_game = l10_goals_against / 10
+        l10_goal_differential_per_game = l10_goal_differential / 10
+
+        if is_home_team:
+            home_win_percentage = home_wins / total_home_games
+            home_loss_percentage = home_losses / total_home_games
+            home_ot_loss_percentage = home_ot_losses / total_home_games
+            home_goals_for_per_game = home_goals_for / total_home_games
+            home_goals_against_per_game = home_goals_against / total_home_games
+            home_goal_differential_per_game = home_goal_differential / total_home_games
+        else:
+            away_win_percentage = away_wins / total_away_games
+            away_loss_percentage = away_losses / total_away_games
+            away_ot_loss_percentage = away_ot_losses / total_away_games
+            away_goals_for_per_game = away_goals_for / total_away_games
+            away_goals_against_per_game = away_goals_against / total_away_games
+            away_goal_differential_per_game = away_goal_differential / total_away_games
+
+
+    if is_home_team:
+        return (win_percentage, 
+                loss_percentage, 
+                ot_loss_percentage, 
+                goals_for_per_game,
+                goals_against_per_game,
+                goal_differential_per_game,
+                l10_win_percentage,
+                l10_loss_percentage,
+                l10_ot_losses,
+                l10_goals_for_per_game,
+                l10_goals_against_per_game,
+                l10_goal_differential_per_game,
+                home_win_percentage,
+                home_loss_percentage,
+                home_ot_loss_percentage,
+                home_goals_for_per_game,
+                home_goals_against_per_game,
+                home_goal_differential_per_game)
+    else:
+        return (win_percentage, 
+                loss_percentage, 
+                ot_loss_percentage, 
+                goals_for_per_game,
+                goals_against_per_game,
+                goal_differential_per_game,
+                l10_win_percentage,
+                l10_loss_percentage,
+                l10_ot_losses,
+                l10_goals_for_per_game,
+                l10_goals_against_per_game,
+                l10_goal_differential_per_game,
+                away_win_percentage,
+                away_loss_percentage,
+                away_ot_loss_percentage,
+                away_goals_for_per_game,
+                away_goals_against_per_game,
+                away_goal_differential_per_game)
