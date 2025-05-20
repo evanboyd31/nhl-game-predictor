@@ -120,12 +120,6 @@ def get_preseason_games_for_team_and_before_date_this_season(team_id : int, date
                                                                     date=date,
                                                                     game_type=Game.PRESEASON)
 
-def get_playoff_games_for_team_and_before_date_this_season(team_id : int, date):
-    return get_game_type_games_for_team_and_before_date_this_season(team_id=team_id, 
-                                                                    date=date,
-                                                                    game_type=Game.PLAYOFFS)
-
-
 def compute_stats_over_games_queryset(games_queryset : QuerySet[Game], team : Team, is_home_team : bool):
     if not games_queryset.exists():
         win_percentage = 0
