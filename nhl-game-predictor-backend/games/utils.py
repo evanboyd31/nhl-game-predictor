@@ -115,11 +115,6 @@ def get_game_type_games_for_team_and_before_date_this_season(team_id : int, date
                                 game_json__gameType=game_type)
     return games
 
-def get_preseason_games_for_team_and_before_date_this_season(team_id : int, date):
-    return get_game_type_games_for_team_and_before_date_this_season(team_id=team_id,
-                                                                    date=date,
-                                                                    game_type=Game.PRESEASON)
-
 def compute_stats_over_games_queryset(games_queryset : QuerySet[Game], team : Team, is_home_team : bool):
     if not games_queryset.exists():
         win_percentage = 0
@@ -274,10 +269,12 @@ def create_game_data_frame_entry_for_preseason_game(game : Game):
     away_team_id = game.away_team.pk
 
     # retrive the preseason games prior to the date of the game
-    home_team_preseason_games = get_preseason_games_for_team_and_before_date_this_season(team_id=home_team_id,
-                                                                                            date=game_date)
-    away_team_preseason_games = get_preseason_games_for_team_and_before_date_this_season(team_id=away_team_id,
-                                                                                            date=game_date)
+    home_team_preseason_games = get_game_type_games_for_team_and_before_date_this_season(team_id=home_team_id,
+                                                                                         date=game_date,
+                                                                                         game_type=Game.PRESEASON)
+    away_team_preseason_games = get_game_type_games_for_team_and_before_date_this_season(team_id=away_team_id,
+                                                                                         date=game_date,
+                                                                                         game_type=Game.PRESEASON)
     # create features using helper function
     home_team = game.home_team
     away_team = game.away_team
