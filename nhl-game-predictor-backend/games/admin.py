@@ -40,7 +40,7 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ('home_team__name', 'away_team__name')
     date_hierarchy = 'game_date'
 
-    def is_completed(self, obj):
+    def is_completed(self, obj : Game):
         """
         displays the is_completed() return result of a Game
         as a field on the admin page
@@ -60,7 +60,7 @@ class GamePredictionAdmin(admin.ModelAdmin):
     list_filter = ('predicted_home_team_win',)
     search_fields = ('game__home_team__name', 'game__away_team__name')
 
-    def display_top_features(self, obj):
+    def display_top_features(self, obj :GamePrediction):
         """
         Display top features and their importance scores. A maximum of 5 features and their 
         respective importances are stored in a GamePrediction model class
