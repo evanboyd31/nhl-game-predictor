@@ -13,6 +13,7 @@ from predictor.models import PredictionModel
 from predictor.ml_models.train_model import create_seasons_dataframe, create_training_data
 from lime.lime_tabular import LimeTabularExplainer
 from games.data_loader import load_team_data_for_date_from_api
+from django.db.models.query import QuerySet
 
 def load_random_forest_model():
     """
@@ -34,7 +35,7 @@ def load_random_forest_model():
     
     return model
 
-def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, model, training_features):
+def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : pd.DataFrame, model, training_features : pd.DataFrame) -> dict:
     """
     get the top 5 features driving the prediction outcome for a specific game
     """
@@ -85,7 +86,7 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df, m
 
     return top_features_dictionary
 
-def predict_game_outcome(game, model, training_features):
+def predict_game_outcome(game : Game, model, training_features : pd.DataFrame) -> GamePrediction:
     """
     predict the outcome of a game using the latest Random Forest model.
     """
@@ -127,7 +128,7 @@ def predict_game_outcome(game, model, training_features):
     return game_prediction
 
 @transaction.atomic
-def predict_games(games):
+def predict_games(games : QuerySet[Game]) -> list:
     """
     function to create GamePredictions for all games on the current date
     """
