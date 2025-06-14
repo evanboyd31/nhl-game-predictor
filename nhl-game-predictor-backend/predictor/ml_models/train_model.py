@@ -16,7 +16,7 @@ from predictor.ml_models.utils import GameDataFrameEntry
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
-def generate_past_season_ids(past_seasons):
+def generate_past_season_ids(past_seasons : list):
     """
     generates a list of the n past season IDs of the form 20XX20XX
     as required by the official NHL API
@@ -39,7 +39,7 @@ def generate_past_season_ids(past_seasons):
     
     return season_ids
 
-def create_seasons_dataframe(past_seasons):
+def create_seasons_dataframe(past_seasons : list):
     """
     creates a pandas dataframe of all games that took place in the
     list of seasons in past_seasons array of season IDs
@@ -58,7 +58,7 @@ def create_seasons_dataframe(past_seasons):
 
     return game_data_df
 
-def create_training_data(game_data_df):
+def create_training_data(game_data_df : pd.DataFrame):
     """
     splits a pandas dataframe of game data into training and validation sets
     as required by the Random Forest model
@@ -74,7 +74,7 @@ def create_training_data(game_data_df):
                             random_state=31)
 
 @transaction.atomic
-def train_random_forest(past_seasons):
+def train_random_forest(past_seasons : list):
     """
     trains a new Random Forest model on the seasons in the past_seasons array.
     for example, calling train_random_forest([20242025, 20232024]) will train 
