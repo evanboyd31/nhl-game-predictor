@@ -22,7 +22,7 @@ RESULT_MAP = {
 # reverse results map
 REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
-def convert_game_json_to_game_data_objects(game_json, date_string, get_team_data=False):
+def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, get_team_data : bool = False):
     game_id = game_json.get("id")
     game_type = game_json.get("gameType")
     game_date = datetime.strptime(date_string, "%Y-%m-%d").date()
@@ -68,7 +68,7 @@ def convert_game_json_to_game_data_objects(game_json, date_string, get_team_data
     return game, home_team_data, away_team_data
 
 @transaction.atomic
-def fetch_games_for_date(date, get_team_data=True):
+def fetch_games_for_date(date : datetime, get_team_data : bool = True):
     """
     fetches game JSONs from the NHL api and create Game
     Django objects. Optionally, TeamData objects are recorded as well.
@@ -169,7 +169,7 @@ def load_active_team_logo_urls():
 
 
 @transaction.atomic
-def load_team_data_for_date_from_api(team : Team, game_date):
+def load_team_data_for_date_from_api(team : Team, game_date : datetime):
     """
     creates a TeamData instance for a particular game. a TeamData
     instance is the team's statistics on the day prior to the game, as provided
@@ -205,7 +205,7 @@ def load_team_data_for_date_from_api(team : Team, game_date):
         return None
 
 @transaction.atomic
-def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True):
+def load_games_for_team_from_api(team_abbreviation : str, seasons : list, get_team_data : bool = True):
     """
     given the abbreviation of a team, load Game and TeamData model instances
     into the database. 
@@ -300,7 +300,7 @@ def load_games_for_team_from_api(team_abbreviation, seasons, get_team_data=True)
     Game.objects.bulk_create(games_to_create)
 
 @transaction.atomic
-def load_games_for_all_teams_from_api(seasons, get_team_data=True):
+def load_games_for_all_teams_from_api(seasons : list, get_team_data : bool = True):
     """
     given a list of season ids (such as [20202021, 20212022]), get all
     NHL games for each of the seasons. optionally, create TeamData instances,

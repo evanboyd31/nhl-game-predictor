@@ -63,7 +63,7 @@ class GamePredictionSerializer(serializers.ModelSerializer):
     
     top_features_descriptions = serializers.SerializerMethodField()
 
-    def get_top_features_descriptions(self, obj):
+    def get_top_features_descriptions(self, obj : GamePrediction):
         """
         maps the original feature name to its corresponding descriptive feature sentence
         to display in the React frontend. the descriptions are stored in the 
