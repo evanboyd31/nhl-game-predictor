@@ -9,5 +9,15 @@ services:
     ports:
       - "5433:5432"
 
+  backend:
+    build:
+      context: ./nhl-game-predictor-backend
+    env_file:
+      - ./nhl-game-predictor-backend/.env
+    ports:
+      - "8001:8000"
+    depends_on:
+      - database
+
 volumes:
   postgres_data:
