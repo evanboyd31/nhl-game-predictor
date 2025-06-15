@@ -19,5 +19,15 @@ services:
     depends_on:
       - database
 
+  frontend:
+    build:
+      context: ./nhl-game-predictor-frontend
+    env_file:
+      - ./nhl-game-predictor-frontend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
