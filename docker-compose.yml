@@ -1,0 +1,47 @@
+services:
+  database:
+    container_name: nhl-game-predictor-db
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend:
+    container_name: nhl-game-predictor-backend
+    build:
+      context: ./nhl-game-predictor-backend
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - PREDICT_GAMES_TODAY_ACCESS_TOKEN=${PREDICT_GAMES_TODAY_ACCESS_TOKEN}
+      - KEEP_ACTIVE_ACCESS_TOKEN=${KEEP_ACTIVE_ACCESS_TOKEN}
+      - FETCH_GAMES_TOKEN=${FETCH_GAMES_TOKEN}
+    ports:
+      - "8001:8000"
+    depends_on:
+      - database
+
+  frontend:
+    container_name: nhl-game-predictor-frontend
+    build:
+      context: ./nhl-game-predictor-frontend
+    environment:
+      - REACT_APP_BASE_API_URL=${REACT_APP_BASE_API_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -22,8 +22,6 @@ RUN poetry install --no-root
 # copy application
 COPY . .
 
-# collect static files using poetry's run command
-RUN poetry run python manage.py collectstatic --noinput
-
-# command to start the django application
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+# change permissions for entry point script and run
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
