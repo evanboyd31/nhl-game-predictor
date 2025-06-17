@@ -16,8 +16,17 @@ services:
     container_name: nhl-game-predictor-backend
     build:
       context: ./nhl-game-predictor-backend
-    env_file:
-      - ./nhl-game-predictor-backend/.env
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - PREDICT_GAMES_TODAY_ACCESS_TOKEN=${PREDICT_GAMES_TODAY_ACCESS_TOKEN}
+      - KEEP_ACTIVE_ACCESS_TOKEN=${KEEP_ACTIVE_ACCESS_TOKEN}
+      - FETCH_GAMES_TOKEN=${FETCH_GAMES_TOKEN}
     ports:
       - "8001:8000"
     depends_on:
