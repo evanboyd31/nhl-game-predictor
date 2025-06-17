@@ -34,20 +34,25 @@ USE_TZ = True
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # allowed hosts for development and production environments
-ALLOWED_HOSTS = ['nhl-game-predictor.onrender.com', 
-                 'nhl-game-predictor-backend.onrender.com', 
-                 'localhost', 
-                 '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://nhl-game-predictor-backend.onrender.com', 
-                        'https://nhl-game-predictor.onrender.com',
-                        'https://localhost:3000',
-                        'http://127.0.0.1:3000',
-                        'http://localhost:3000']
+ALLOWED_HOSTS = [
+    'nhl-game-predictor.onrender.com', 
+    'nhl-game-predictor-backend.onrender.com', 
+    'localhost', 
+    '127.0.0.1'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://nhl-game-predictor-backend.onrender.com', 
+    'https://nhl-game-predictor.onrender.com',
+    'https://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000'
+]
 
 CORS_ALLOWED_ORIGINS = [
     'https://nhl-game-predictor.onrender.com',
     "http://localhost:3000",
-    "http://127.0.0.1:3000", 
+    "http://127.0.0.1:3000"
 ]
 
 SESSION_COOKIE_SECURE = True
