@@ -36,8 +36,8 @@ services:
     container_name: nhl-game-predictor-frontend
     build:
       context: ./nhl-game-predictor-frontend
-    env_file:
-      - ./nhl-game-predictor-frontend/.env
+    environment:
+      - REACT_APP_BASE_API_URL=${REACT_APP_BASE_API_URL}
     ports:
       - "3000:3000"
     depends_on:
