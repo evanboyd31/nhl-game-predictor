@@ -1,5 +1,6 @@
 services:
   database:
+    container_name: nhl-game-predictor-db
     image: postgres:15
     restart: always
     env_file:
@@ -10,6 +11,7 @@ services:
       - "5433:5432"
 
   backend:
+    container_name: nhl-game-predictor-backend
     build:
       context: ./nhl-game-predictor-backend
     env_file:
@@ -20,6 +22,7 @@ services:
       - database
 
   frontend:
+    container_name: nhl-game-predictor-frontend
     build:
       context: ./nhl-game-predictor-frontend
     env_file:
