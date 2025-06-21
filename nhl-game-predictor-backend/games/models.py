@@ -74,6 +74,8 @@ class Game(models.Model):
     # date of game
     game_date = models.DateField()
 
+    season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, related_name='games')
+
     # game type
     PRESEASON = 1
     REGULAR_SEASON = 2
