@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Franchise, Team, TeamData, Game, GamePrediction
+from .models import Franchise, Season, Team, TeamData, Game, GamePrediction
 
 @admin.register(Franchise)
 class FranchiseAdmin(admin.ModelAdmin):
@@ -28,6 +28,14 @@ class TeamDataAdmin(admin.ModelAdmin):
     search_fields = ('team__name', 'team__abbreviation')
     date_hierarchy = 'data_capture_date'
 
+@admin.register(Season)
+class SeasonAdmin(admin.ModelAdmin):
+    """
+    display of the Season model class on the admin page
+    """
+    list_display = ('id', 'regularSeasonStart', 'regularSeasonEnd')
+    list_filter = ('id',)
+    search_fields = ('id',)
 
 # Game Admin configuration
 @admin.register(Game)

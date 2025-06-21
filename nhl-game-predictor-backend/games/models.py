@@ -45,6 +45,18 @@ class TeamData(models.Model):
     def __str__(self):
         return f"{self.team} Data ({self.data_capture_date})"
     
+class Season(models.Model):
+    """
+    class to represent an NHL season
+    """
+    id = models.BigIntegerField(primary_key=True)
+
+    # the endpoint https://api-web.nhle.com/v1/standings/<date>/ is only valid for dates between regularSeasonStart and regularSeasonEnd
+    regularSeasonStart = models.DateField()
+    regularSeasonEnd = models.DateField()
+
+    season_json = models.JSONField(default=dict)
+
 class Game(models.Model):
     """
     class to represent a single NHL game
@@ -61,6 +73,8 @@ class Game(models.Model):
 
     # date of game
     game_date = models.DateField()
+
+    season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, related_name='games')
 
     # game type
     PRESEASON = 1
