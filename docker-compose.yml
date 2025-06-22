@@ -27,6 +27,11 @@ services:
       - PREDICT_GAMES_TODAY_ACCESS_TOKEN=${PREDICT_GAMES_TODAY_ACCESS_TOKEN}
       - KEEP_ACTIVE_ACCESS_TOKEN=${KEEP_ACTIVE_ACCESS_TOKEN}
       - FETCH_GAMES_TOKEN=${FETCH_GAMES_TOKEN}
+      - PROD_DATABASE_NAME=${PROD_DATABASE_NAME}
+      - PROD_DATABASE_USER=${PROD_DATABASE_USER}
+      - PROD_DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
+      - PROD_DATABASE_HOST=${PROD_DATABASE_HOST}
+      - PROD_DATABASE_PORT=${PROD_DATABASE_PORT}
     volumes:
       - ./nhl-game-predictor-backend:/app:cached
       - /app/.venv # this prevents host code from overwriting virtualenv in container
