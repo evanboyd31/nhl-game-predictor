@@ -50,3 +50,4 @@ ehthumbs.db
 nhl-game-predictor-backend/
 
 games/management/commands/local_db_dumps/
+games/management/commands/prod_db_dumps/
