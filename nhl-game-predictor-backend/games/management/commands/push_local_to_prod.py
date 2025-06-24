@@ -38,18 +38,34 @@ class Command(BaseCommand):
     now = timezone.now().strftime("%Y%m%d_%H%M%S")
     command_dir = os.path.dirname(os.path.abspath(__file__))
     dump_dir = os.path.join(command_dir, "local_db_dumps")
-    dump_file_path = f"{dump_dir}/local_dump_{now}.sql"
+    dump_file_path = f"{dump_dir}/local_dump_{now}.dump"
     os.makedirs(dump_dir, exist_ok=True)
 
     # dump local DB
     self.stdout.write("Dumping local DB...")
     subprocess.run([
-      'pg_dump',
-      '-h', local_db_host,
-      '-p', local_db_port,
-      '-U', local_db_user,
-      '-d', local_db_name,
-      '-f', dump_file_path
+      "pg_dump",
+      "-Fc",
+      "-h", local_db_host,
+      "-p", local_db_port,
+      "-U", local_db_user,
+      "-d", local_db_name,
+      "-f", dump_file_path
     ], check=True, env={"PGPASSWORD": local_db_password})
 
     self.stdout.write(f"Dumped local DB into `{dump_file_path}`.")
+
+    # restore prod from local DB
+    self.stdout.write("Pushing local dump to prod...")
+    subprocess.run([
+      "pg_restore",
+      "--clean",
+      "--if-exists",
+      "-h", prod_db_host,
+      "-p", prod_db_port,
+      "-d", prod_db_name,
+      "-U", prod_db_user,
+      "-v", dump_file_path
+    ], check=True, env={"PGPASSWORD": prod_db_password})
+
+    self.stdout.write(f"Pushed local DB to prod.")
