@@ -48,3 +48,5 @@ ehthumbs.db
 *.tmp
 
 nhl-game-predictor-backend/
+
+games/management/commands/local_db_dumps/
