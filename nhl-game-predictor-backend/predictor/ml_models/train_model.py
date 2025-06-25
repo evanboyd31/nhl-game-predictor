@@ -12,6 +12,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -109,3 +112,43 @@ def train_random_forest(past_seasons : list):
         pickle.dump(random_forest, file)
 
     print(f"Model Random Forest (v{new_version}) saved successfully.")
+@transaction.atomic
+def train_linear_regression(past_seasons: list):
+    """
+    Trains a new Linear Regression model on the seasons in the past_seasons array.
+    Saves the model and logs its evaluation metrics.
+    """
+    game_data_df = create_seasons_dataframe(past_seasons=past_seasons)
+
+    training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
+
+    # create and train the model
+    linear_model = LinearRegression()
+    linear_model.fit(training_features, training_labels)
+
+    # make predictions
+    predictions = linear_model.predict(testing_features)
+
+    # evaluate
+    mse = mean_squared_error(testing_labels, predictions)
+    r2 = r2_score(testing_labels, predictions)
+
+    print("Linear Regression Results:")
+    print(f"  Mean Squared Error: {mse:.4f}")
+    print(f"  R² Score: {r2:.4f}")
+
+    # versioning
+    last_version = PredictionModel.objects.filter(name="Linear Regression").aggregate(Max('version'))['version__max']
+    if last_version:
+        major, minor = map(int, last_version.split('.'))
+        new_version = f"{major}.{minor + 1}"
+    else:
+        new_version = "1.0"
+
+    prediction_model = PredictionModel.objects.create(name="Linear Regression", version=new_version)
+
+    # save the model
+    with open(f'./predictor/ml_models/trained_models/linear-regression-v-{new_version.replace(".", "-")}.pkl', 'wb') as file:
+        pickle.dump(linear_model, file)
+
+    print(f"Model Linear Regression (v{new_version}) saved successfully.")
