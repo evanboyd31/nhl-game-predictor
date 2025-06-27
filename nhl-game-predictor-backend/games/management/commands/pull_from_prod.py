@@ -78,6 +78,9 @@ class Command(BaseCommand):
 
     self.stdout.write(f"Dumped prod DB into `{dump_file_path}`.")
 
+    # restore local from prod DB
+    included_tables = self.get_db_tables_from_inspectdb()
+
     # drop the local DB
     subprocess.run([
         "psql",
@@ -97,3 +100,26 @@ class Command(BaseCommand):
         "-d", "postgres",
         "-c", f"CREATE DATABASE {local_db_name};"
     ], check=True, env={"PGPASSWORD": local_db_password})
+
+    restore_command = [
+      "pg_restore",
+      "--clean",
+      "--if-exists",
+      "--no-acl",
+      "--no-owner",
+    ]
+
+    for table in included_tables:
+      restore_command += ["--table", table]
+
+    restore_command += [
+      "-h", local_db_host,
+      "-p", local_db_port,
+      "-d", local_db_name,
+      "-U", local_db_user,
+      "-v", dump_file_path
+    ]
+
+    subprocess.run(restore_command, 
+                   check=True, 
+                   env={"PGPASSWORD": local_db_password})
