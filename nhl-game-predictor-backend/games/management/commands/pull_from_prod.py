@@ -1,10 +1,33 @@
 import os
 import subprocess
+import re
+from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 class Command(BaseCommand):
   help = "Restores the production Supabase instance with your local database"
+
+  def get_db_tables_from_inspectdb(self):
+    # run command to get names of all Django related PostgreSQL tables
+    project_root = Path(__file__).resolve().parents[3]
+    manage_py_path = project_root / "manage.py"
+    result = subprocess.run(
+      ["python", manage_py_path, "inspectdb"],
+      capture_output=True,
+      text=True,
+      check=True
+    )
+
+    # use regex for finding table names from above command
+    inspectdb_output = result.stdout
+    table_names = []
+    for line in inspectdb_output.splitlines():
+      match = re.search(r"db_table = ['\"]([\w_]+)['\"]", line)
+      if match:
+        table_names.append(match.group(1))
+
+    return table_names
 
   def handle(self, *args, **options):
     # credentials needed to access local database
