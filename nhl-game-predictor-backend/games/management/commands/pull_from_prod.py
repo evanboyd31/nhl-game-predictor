@@ -77,3 +77,23 @@ class Command(BaseCommand):
     ], check=True, env={"PGPASSWORD": prod_db_password})
 
     self.stdout.write(f"Dumped prod DB into `{dump_file_path}`.")
+
+    # drop the local DB
+    subprocess.run([
+        "psql",
+        "-h", local_db_host,
+        "-p", local_db_port,
+        "-U", local_db_user,
+        "-d", "postgres",  # connect to a separate DB to run DROP
+        "-c", f"DROP DATABASE IF EXISTS {local_db_name};"
+    ], check=True, env={"PGPASSWORD": local_db_password})
+
+    # recreate the local DB
+    subprocess.run([
+        "psql",
+        "-h", local_db_host,
+        "-p", local_db_port,
+        "-U", local_db_user,
+        "-d", "postgres",
+        "-c", f"CREATE DATABASE {local_db_name};"
+    ], check=True, env={"PGPASSWORD": local_db_password})
