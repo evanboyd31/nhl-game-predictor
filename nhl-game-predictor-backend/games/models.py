@@ -26,7 +26,8 @@ class TeamData(models.Model):
     """
     class to record a team's statistics for a provided day for model training
     """
-
+    id = models.BigAutoField(primary_key=True)
+    
     # associated to a team
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_data')
     # date that the data captures for
