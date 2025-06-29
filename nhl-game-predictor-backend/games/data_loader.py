@@ -325,7 +325,8 @@ def clear_database():
 
 @transaction.atomic
 def update_completed_games():
-    completed_games_dates = Game.objects.filter(winning_team__isnull=True).values_list("game_date", flat=True).distinct()
+    today = timezone.localdate()
+    completed_games_dates = Game.objects.filter(winning_team__isnull=True, game_date__lt=today).values_list("game_date", flat=True).distinct()
     games_to_update = []
     team_datas_to_create = []
 
