@@ -7,7 +7,7 @@ from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
-from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission
+from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission, UpdateCompletedGamesPermission
 from .data_loader import fetch_games_for_date, update_completed_games
 
 class GameDetailView(generics.RetrieveAPIView):
@@ -196,7 +196,7 @@ class UpdateCompletedGamesView(generics.ListAPIView):
     """
     # only callers with a specific API token can call this endpoint to predict games
     # so the RAM limit of the Render backend server is not exceeded
-    permission_classes = [FetchGamesFromNHLAPIByDatePermission]
+    permission_classes = [UpdateCompletedGamesPermission]
     serializer_class = GameSerializer
         
     def get_queryset(self):
