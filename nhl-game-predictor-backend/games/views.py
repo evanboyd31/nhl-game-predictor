@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
 from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission
-from .data_loader import fetch_games_for_date
+from .data_loader import fetch_games_for_date, update_completed_games
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -161,7 +161,6 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
     # so the RAM limit of the Render backend server is not exceeded
     permission_classes = [FetchGamesFromNHLAPIByDatePermission]
     serializer_class = GameSerializer
-    _games = None
 
     def get_date(self):
         """
@@ -180,9 +179,6 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
             raise ParseError("Invalid date format. Use 'YYYY-MM-DD'.")
         
     def get_queryset(self):
-        if self._games is not None:
-            return self._games
-        
         date = self.get_date()
         games = fetch_games_for_date(date=date,
                                      get_team_data=True)
@@ -191,5 +187,4 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
         if len(games) == 0:
             raise NotFound("There are no NHL games scheduled today.")
 
-        self._games = games
         return games
