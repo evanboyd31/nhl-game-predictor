@@ -7,8 +7,8 @@ from .serializers import GameSerializer, GamePredictionSerializer
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from predictor.ml_models.predict_model import predict_games
-from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission
-from .data_loader import fetch_games_for_date
+from .permissions import FetchGamesFromNHLAPIByDatePermission, KeepActivePermission, PredictGamesTodayPermission, UpdateCompletedGamesPermission
+from .data_loader import fetch_games_for_date, update_completed_games
 
 class GameDetailView(generics.RetrieveAPIView):
     """
@@ -161,7 +161,6 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
     # so the RAM limit of the Render backend server is not exceeded
     permission_classes = [FetchGamesFromNHLAPIByDatePermission]
     serializer_class = GameSerializer
-    _games = None
 
     def get_date(self):
         """
@@ -180,9 +179,6 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
             raise ParseError("Invalid date format. Use 'YYYY-MM-DD'.")
         
     def get_queryset(self):
-        if self._games is not None:
-            return self._games
-        
         date = self.get_date()
         games = fetch_games_for_date(date=date,
                                      get_team_data=True)
@@ -191,5 +187,23 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
         if len(games) == 0:
             raise NotFound("There are no NHL games scheduled today.")
 
-        self._games = games
+        return games
+    
+class UpdateCompletedGamesView(generics.ListAPIView):
+    """
+    REST API to update fields of Games that have been completed (do not have a winning team and take place before today)
+.   TeamData objects are also created, if the Game does not yet have one for both the home team and away team
+    """
+    # only callers with a specific API token can call this endpoint to predict games
+    # so the RAM limit of the Render backend server is not exceeded
+    permission_classes = [UpdateCompletedGamesPermission]
+    serializer_class = GameSerializer
+        
+    def get_queryset(self):
+        games = update_completed_games()
+
+        # no games were updated, so raise an error saying so
+        if len(games) == 0:
+            raise NotFound("No games updated.")
+        
         return games

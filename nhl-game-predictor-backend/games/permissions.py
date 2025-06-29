@@ -33,9 +33,18 @@ class KeepActivePermission(TokenBasedPermission):
     
 class FetchGamesFromNHLAPIByDatePermission(TokenBasedPermission):
     """
-    custom permission class to ensure that only the keep_servers_active.py script
-    can call the KeepActiveView API endpoint
+    custom permission class to ensure that only the fetch_games.py script
+    can call the FetchGamesFromNHLAPIByDateView API endpoint
     """
 
     token_header_name = "FETCH-GAMES-TOKEN"
     expected_token_value = settings.FETCH_GAMES_TOKEN
+
+class UpdateCompletedGamesPermission(TokenBasedPermission):
+    """
+    custom permission class to ensure that only the update_completed_games.py script
+    can call the UpdateCompletedGamesView API endpoint
+    """
+
+    token_header_name = "UPDATE-COMPLETED-GAMES-TOKEN"
+    expected_token_value = settings.UPDATE_COMPLETED_GAMES_TOKEN
