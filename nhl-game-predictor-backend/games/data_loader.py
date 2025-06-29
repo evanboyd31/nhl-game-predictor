@@ -75,6 +75,12 @@ def fetch_games_for_date(date : datetime, get_team_data : bool = True):
     Returns True in the case that there are games on the given date,
     False otherwise.
     """
+
+    # first check to see if the games already exist before calling API
+    games_for_date_in_db = Game.objects.filter(game_date=date)
+    if games_for_date_in_db.exists():
+        return games_for_date_in_db
+    
     date_string = date.strftime("%Y-%m-%d")
     schedule_url = f"https://api-web.nhle.com/v1/schedule/{date_string}"
     schedule_response = httpx.get(schedule_url)
@@ -324,7 +330,7 @@ def clear_database():
     TeamData.objects.all().delete()
 
 @transaction.atomic
-def update_completed_games():
+def update_completed_games() -> list:
     today = timezone.localdate()
     completed_games_dates = Game.objects.filter(winning_team__isnull=True, game_date__lt=today).values_list("game_date", flat=True).distinct()
     games_to_update = []
