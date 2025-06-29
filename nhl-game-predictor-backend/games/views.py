@@ -188,3 +188,22 @@ class FetchGamesFromNHLAPIByDateView(generics.ListAPIView):
             raise NotFound("There are no NHL games scheduled today.")
 
         return games
+    
+class UpdateCompletedGamesView(generics.ListAPIView):
+    """
+    REST API to update fields of Games that have been completed (do not have a winning team and take place before today)
+.   TeamData objects are also created, if the Game does not yet have one for both the home team and away team
+    """
+    # only callers with a specific API token can call this endpoint to predict games
+    # so the RAM limit of the Render backend server is not exceeded
+    permission_classes = [FetchGamesFromNHLAPIByDatePermission]
+    serializer_class = GameSerializer
+        
+    def get_queryset(self):
+        games = update_completed_games()
+
+        # no games were updated, so raise an error saying so
+        if len(games) == 0:
+            raise NotFound("No games updated.")
+        
+        return games
