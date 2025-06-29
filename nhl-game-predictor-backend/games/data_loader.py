@@ -379,3 +379,5 @@ def update_completed_games():
     if games_to_update:
         Game.objects.bulk_update(games_to_update,
                                  ["game_json", "winning_team", "home_team_data", "away_team_data"])
+        
+    return games_to_update
