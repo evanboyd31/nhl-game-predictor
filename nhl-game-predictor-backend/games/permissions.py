@@ -42,7 +42,7 @@ class FetchGamesFromNHLAPIByDatePermission(TokenBasedPermission):
 
 class UpdateCompletedGamesPermission(TokenBasedPermission):
     """
-    custom permission class to ensure that only the update_completed_games().py script
+    custom permission class to ensure that only the update_completed_games.py script
     can call the UpdateCompletedGamesView API endpoint
     """
 
