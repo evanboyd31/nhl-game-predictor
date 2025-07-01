@@ -53,8 +53,8 @@ class Season(models.Model):
     id = models.BigIntegerField(primary_key=True)
 
     # the endpoint https://api-web.nhle.com/v1/standings/<date>/ is only valid for dates between regularSeasonStart and regularSeasonEnd
-    regularSeasonStart = models.DateField()
-    regularSeasonEnd = models.DateField()
+    regular_season_start = models.DateField()
+    regular_season_end = models.DateField()
 
     season_json = models.JSONField(default=dict)
 
