@@ -75,13 +75,14 @@ def load_playoff_games(apps, season_id):
   Season = apps.get_model('games', 'Season')
 
   season = Season.objects.filter(id=season_id).first()
-  prev_season_id = get_previous_season_id(season_id=season_id)
-  prev_season = Season.objects.filter(id=prev_season_id).first()
+  next_season_id = get_next_season_id(season_id=season_id)
+  next_season = Season.objects.filter(id=next_season_id).first()
   
-  prev_season_end = prev_season.regular_season_end
-  season_start = season.regular_season_start
+  season_end = season.regular_season_end
+  # if the next season doesn't yet exist, assume it starts 1 year in the future from the current season
+  next_season_start = next_season.regular_season_start if next_season is not None else season.regular_season_start + timedelta(years=1)
 
-  all_dates = list(daterange(prev_season_end, season_start))
+  all_dates = list(daterange(season_end, next_season_start))
 
   games_to_create = []
   
@@ -95,7 +96,7 @@ def load_playoff_games(apps, season_id):
     # iterate over all games
     for game_json in games_for_date_json:
         game_type = game_json.get("gameType")
-        if game_type == 1:
+        if game_type == 3:
           game, _, _ = convert_game_json_to_game_data_objects(game_json=game_json,
                                                               date_string=date_string,
                                                               get_team_data=False)
@@ -114,7 +115,7 @@ def load_preseason_playoff_games(apps, schema_editor):
 
   for season_id in season_ids:
     load_preseason_games(apps, season_id=season_id)
-    # load_playoff_games(season_id=season_id)
+    load_playoff_games(apps, season_id=season_id)
 
 class Migration(migrations.Migration):
 
