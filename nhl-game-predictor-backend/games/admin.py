@@ -33,7 +33,7 @@ class SeasonAdmin(admin.ModelAdmin):
     """
     display of the Season model class on the admin page
     """
-    list_display = ('id', 'regularSeasonStart', 'regularSeasonEnd')
+    list_display = ('id', 'regular_season_start', 'regular_season_end')
     list_filter = ('id',)
     search_fields = ('id',)
 
