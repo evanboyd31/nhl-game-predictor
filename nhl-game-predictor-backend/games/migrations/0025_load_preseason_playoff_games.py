@@ -117,6 +117,20 @@ def load_preseason_playoff_games(apps, schema_editor):
     load_preseason_games(apps, season_id=season_id)
     load_playoff_games(apps, season_id=season_id)
 
+def unload_preseason_playoff_games(apps, schema_editor):
+    Game = apps.get_model('games', 'Game')
+
+    PRESEASON = 1
+    PLAYOFFS = 3
+
+    season_ids = [
+        20222023,
+        20232024,
+        20242025
+    ]
+
+    Game.objects.filter(season_id__in=season_ids, game_json__gameType__in=[PRESEASON, PLAYOFFS]).delete()
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -124,5 +138,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(load_preseason_playoff_games)
+        migrations.RunPython(load_preseason_playoff_games, reverse_code=unload_preseason_playoff_games)
     ]
