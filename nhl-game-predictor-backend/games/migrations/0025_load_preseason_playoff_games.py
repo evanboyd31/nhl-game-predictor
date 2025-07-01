@@ -80,7 +80,7 @@ def load_playoff_games(apps, season_id):
   
   season_end = season.regular_season_end
   # if the next season doesn't yet exist, assume it starts 1 year in the future from the current season
-  next_season_start = next_season.regular_season_start if next_season is not None else season.regular_season_start + timedelta(years=1)
+  next_season_start = next_season.regular_season_start if next_season is not None else season.regular_season_start + timedelta(days=365)
 
   all_dates = list(daterange(season_end, next_season_start))
 
