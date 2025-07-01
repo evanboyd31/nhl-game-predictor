@@ -26,6 +26,15 @@ def get_previous_season_id(season_id: int) -> int:
   prev_end_year = start_year
   return int(f"{prev_start_year}{prev_end_year}")
 
+def get_next_season_id(season_id: int) -> int:
+    """
+    given a season ID like 20232024, return the next season ID, e.g., 20242025.
+    """
+    start_year = int(str(season_id)[:4])
+    next_start_year = start_year + 1
+    next_end_year = next_start_year + 1
+    return int(f"{next_start_year}{next_end_year}")
+
 def load_preseason_games(apps, season_id):
   Game = apps.get_model('games', 'Game')
   Season = apps.get_model('games', 'Season')
@@ -62,7 +71,38 @@ def load_preseason_games(apps, season_id):
 
 
 def load_playoff_games(apps, season_id):
-  pass
+  Game = apps.get_model('games', 'Game')
+  Season = apps.get_model('games', 'Season')
+
+  season = Season.objects.filter(id=season_id).first()
+  prev_season_id = get_previous_season_id(season_id=season_id)
+  prev_season = Season.objects.filter(id=prev_season_id).first()
+  
+  prev_season_end = prev_season.regular_season_end
+  season_start = season.regular_season_start
+
+  all_dates = list(daterange(prev_season_end, season_start))
+
+  games_to_create = []
+  
+  for date in all_dates:
+    date_string = date.strftime("%Y-%m-%d")
+    schedule_url = f"https://api-web.nhle.com/v1/schedule/{date_string}"
+    schedule_response = httpx.get(schedule_url)
+    response_json = schedule_response.json()
+    games_for_date_json = response_json.get("gameWeek")[0].get("games", [])
+
+    # iterate over all games
+    for game_json in games_for_date_json:
+        game_type = game_json.get("gameType")
+        if game_type == 1:
+          game, _, _ = convert_game_json_to_game_data_objects(game_json=game_json,
+                                                              date_string=date_string,
+                                                              get_team_data=False)
+          if game is not None:
+              games_to_create.append(game)
+
+  Game.objects.bulk_create(games_to_create)
 
 def load_preseason_playoff_games(apps, schema_editor):
 
