@@ -86,9 +86,6 @@ class Game(models.Model):
     home_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='home_game_data', null=True)
     away_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='away_game_data', null=True)
 
-    class Meta:
-        unique_together = ('home_team', 'away_team', 'game_date')
-
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.game_date.strftime('%Y-%m-%d %H:%M')}"
     
