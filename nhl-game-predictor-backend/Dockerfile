@@ -23,8 +23,8 @@ RUN poetry install --no-root
 COPY . .
 
 # wait for postgres container to be ready before running entrypoint, which generates migrations
-RUN chmod +x /app/wait-for-postgres.sh
+RUN chmod +x /app/script/bash/wait-for-postgres.sh
 
 # change permissions for entry point script and run
-RUN chmod +x /app/entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
+RUN chmod +x /app/scripts/bash/entrypoint.sh
+ENTRYPOINT ["/app/scripts/bash/entrypoint.sh"]
