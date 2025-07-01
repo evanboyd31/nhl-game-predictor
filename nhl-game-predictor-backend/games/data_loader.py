@@ -45,6 +45,10 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
         home_team_abbreviation = home_team_json.get("abbrev")
         home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
 
+        # handle case where games are between an NHL team and non-NHL team (e.g., 2022010107, NSH vs SC Bern)
+        if home_team is None or away_team is None:
+            return None, None, None
+
         winning_team = None
         if home_team_goals != away_team_goals:
             winning_team = home_team if home_team_goals > away_team_goals else away_team
