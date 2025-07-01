@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 django.setup()
 
 from django.conf import settings
-from games.models import Franchise, Team, Game, TeamData
+from games.models import Franchise, Team, Game, TeamData, Season
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.db import transaction
@@ -60,7 +60,10 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
                                                               game_date=game_date)
             
 
+        season_id = game_json.get("season")
+        season = Season.objects.filter(id=season_id).first()
         game = Game(id=game_id,
+                    season=season,
                     game_date=game_date,
                     game_json=game_json,
                     home_team=home_team,
