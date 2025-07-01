@@ -53,8 +53,8 @@ class Season(models.Model):
     id = models.BigIntegerField(primary_key=True)
 
     # the endpoint https://api-web.nhle.com/v1/standings/<date>/ is only valid for dates between regularSeasonStart and regularSeasonEnd
-    regularSeasonStart = models.DateField()
-    regularSeasonEnd = models.DateField()
+    regular_season_start = models.DateField()
+    regular_season_end = models.DateField()
 
     season_json = models.JSONField(default=dict)
 
@@ -85,9 +85,6 @@ class Game(models.Model):
     # relationships to TeamData for pre-game analysis
     home_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='home_game_data', null=True)
     away_team_data = models.ForeignKey(TeamData, on_delete=models.SET_NULL, related_name='away_game_data', null=True)
-
-    class Meta:
-        unique_together = ('home_team', 'away_team', 'game_date')
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.game_date.strftime('%Y-%m-%d %H:%M')}"

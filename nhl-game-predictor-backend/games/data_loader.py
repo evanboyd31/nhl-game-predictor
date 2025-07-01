@@ -37,13 +37,17 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
     game = None
     home_team_data = None
     away_team_data = None
-    if game_type != Game.PRESEASON and Game.objects.filter(id=game_id).count() == 0:
+    if Game.objects.filter(id=game_id).count() == 0:
 
         away_team_abbreviation = away_team_json.get("abbrev")
         away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
 
         home_team_abbreviation = home_team_json.get("abbrev")
         home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
+
+        # handle case where games are between an NHL team and non-NHL team (e.g., 2022010107, NSH vs SC Bern)
+        if home_team is None or away_team is None:
+            return None, None, None
 
         winning_team = None
         if home_team_goals != away_team_goals:
