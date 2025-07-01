@@ -37,7 +37,7 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
     game = None
     home_team_data = None
     away_team_data = None
-    if game_type != Game.PRESEASON and Game.objects.filter(id=game_id).count() == 0:
+    if Game.objects.filter(id=game_id).count() == 0:
 
         away_team_abbreviation = away_team_json.get("abbrev")
         away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
