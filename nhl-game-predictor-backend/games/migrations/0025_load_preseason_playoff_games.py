@@ -27,13 +27,13 @@ def get_previous_season_id(season_id: int) -> int:
   return int(f"{prev_start_year}{prev_end_year}")
 
 def get_next_season_id(season_id: int) -> int:
-    """
-    given a season ID like 20232024, return the next season ID, e.g., 20242025.
-    """
-    start_year = int(str(season_id)[:4])
-    next_start_year = start_year + 1
-    next_end_year = next_start_year + 1
-    return int(f"{next_start_year}{next_end_year}")
+  """
+  given a season ID like 20232024, return the next season ID, e.g., 20242025.
+  """
+  start_year = int(str(season_id)[:4])
+  next_start_year = start_year + 1
+  next_end_year = next_start_year + 1
+  return int(f"{next_start_year}{next_end_year}")
 
 def load_preseason_games(apps, season_id):
   Game = apps.get_model('games', 'Game')
