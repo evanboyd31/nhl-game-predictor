@@ -4,37 +4,39 @@ def assign_season_to_preseason_playoff_games(apps, schema_editor):
   Game = apps.get_model('games', 'Game')
   Season = apps.get_model('games', 'Season')
 
-  games_to_update = []
-
   PRESEASON = 1
   PLAYOFFS = 3
 
-  preseason_playoff_games = Game.objects.filter(game_json__gameType__in=[PRESEASON, PLAYOFFS])
+  season_map = {
+      s.season_id: s
+      for s in Season.objects.all()
+  }
 
-  for game in preseason_playoff_games:
-     game_season_id = game.game_json.get("season")
-     game.season = Season.objects.filter(season_id=game_season_id).first()
-     
-     if game.season is not None:
-        games_to_update.append(game)
+  games = Game.objects.filter(game_json__gameType__in=[PRESEASON, PLAYOFFS])
 
-  Game.objects.bulk_update(games_to_update, fields=['season'])
+  games_to_update = []
+
+  for game in games:
+    game_season_id = game.game_json.get("season")
+    season = season_map.get(game_season_id)
+    if season:
+      game.season = season
+      games_to_update.append(game)
+
+  Game.objects.bulk_update(games_to_update, fields=["season"])
 
 def unassign_season_to_preseason_playoff_games(apps, schema_editor):
   Game = apps.get_model('games', 'Game')
 
-  games_to_update = []
-
   PRESEASON = 1
   PLAYOFFS = 3
 
-  preseason_playoff_games = Game.objects.filter(game_json__gameType__in=[PRESEASON, PLAYOFFS])
+  games = Game.objects.filter(game_json__gameType__in=[PRESEASON, PLAYOFFS], season__isnull=False)
 
-  for game in preseason_playoff_games:
-     game.season = None
-     games_to_update.append(game)
+  for game in games:
+    game.season = None
 
-  Game.objects.bulk_update(games_to_update, fields=['season'])
+  Game.objects.bulk_update(games, fields=["season"])
 
 class Migration(migrations.Migration):
 
