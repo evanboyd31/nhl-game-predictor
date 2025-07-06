@@ -144,7 +144,8 @@ class Game(models.Model):
                                                   away_team=self.away_team,
                                                   season=self.season).union(
                                                             Game.objects.filter(game_json__gameType=self.PRESEASON,
-                                                                                home_team=self.home_team)
+                                                                                home_team=self.away_team,
+                                                                                season=self.season)
                                                   )
             return preseason_games.count() + 1
         
@@ -152,17 +153,29 @@ class Game(models.Model):
         elif self.game_json.get("gameType") == self.REGULAR_SEASON:
             regular_season_games = Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
                                                        away_team=self.away_team,
-                                                       season=self.season)
+                                                       season=self.season).union(
+                                                            Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
+                                                                                home_team=self.away_team,
+                                                                                season=self.season)
+                                                       )
             return regular_season_games.count() + 1
         
         # third case: the game is a playoff game. The first game will be game N + 1, where N is the number of regular season games the team played (may not always be 82!!!)
         else:
             regular_season_games = Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
                                                        away_team=self.away_team,
-                                                       season=self.season)
+                                                       season=self.season).union(
+                                                            Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
+                                                                                home_team=self.away_team,
+                                                                                season=self.season)
+                                                       )
             playoff_games = Game.objects.filter(game_json__gameType=self.PLAYOFFS,
                                                 away_team=self.away_team,
-                                                season=self.season)
+                                                season=self.season).union(
+                                                    Game.objects.filter(game_json__gameType=self.PLAYOFFS,
+                                                                        home_team=self.away_team,
+                                                                        season=self.season)
+                                                )
             return regular_season_games.count() + playoff_games.count() + 1 
     
 
