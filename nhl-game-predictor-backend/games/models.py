@@ -116,6 +116,27 @@ class Game(models.Model):
             playoff_games = Game.objects.filter(game_json__gameType=self.PLAYOFFS,
                                                 home_team=self.home_team)
             return regular_season_games.count() + playoff_games.count() + 1
+        
+    def away_team_game_number(self):
+        # first case: the game is a preseason game. The first game will be game 1
+        if self.game_json.get("gameType") == self.PRESEASON:
+            preseason_games = Game.objects.filter(game_json__gameType=self.PRESEASON,
+                                                  away_team=self.away_team)
+            return preseason_games.count() + 1
+        
+        # second case: the game is a regular season game. The first game will be game 1
+        elif self.game_json.get("gameType") == self.REGULAR_SEASON:
+            regular_season_games = Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
+                                                       away_team=self.away_team)
+            return regular_season_games.count() + 1
+        
+        # third case: the game is a playoff game. The first game will be game N + 1, where N is the number of regular season games the team played (may not always be 82!!!)
+        else:
+            regular_season_games = Game.objects.filter(game_json__gameType=self.REGULAR_SEASON,
+                                                       away_team=self.away_team)
+            playoff_games = Game.objects.filter(game_json__gameType=self.PLAYOFFS,
+                                                away_team=self.away_team)
+            return regular_season_games.count() + playoff_games.count() + 1 
     
 
 class GamePrediction(models.Model):
