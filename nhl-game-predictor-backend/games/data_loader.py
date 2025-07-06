@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 django.setup()
 
 from django.conf import settings
-from games.models import Franchise, Team, Game, TeamData
+from games.models import Franchise, Team, Game, TeamData, Season
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.db import transaction
@@ -24,7 +24,6 @@ REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
 def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, get_team_data : bool = False):
     game_id = game_json.get("id")
-    game_type = game_json.get("gameType")
     game_date = datetime.strptime(date_string, "%Y-%m-%d").date()
     current_date = timezone.localdate()
 
@@ -33,17 +32,21 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
     home_team_goals = home_team_json.get("score", 0)
     away_team_goals = away_team_json.get("score", 0)
 
-    # only create game data when it is not preseason game and doesn't already exist
+    # only create game data when it doesn't already exist
     game = None
     home_team_data = None
     away_team_data = None
-    if game_type != Game.PRESEASON and Game.objects.filter(id=game_id).count() == 0:
+    if Game.objects.filter(id=game_id).count() == 0:
 
         away_team_abbreviation = away_team_json.get("abbrev")
         away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
 
         home_team_abbreviation = home_team_json.get("abbrev")
         home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
+
+        # handle case where games are between an NHL team and non-NHL team (e.g., 2022010107, NSH vs SC Bern)
+        if home_team is None or away_team is None:
+            return None, None, None
 
         winning_team = None
         if home_team_goals != away_team_goals:
@@ -55,8 +58,13 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
             away_team_data = load_team_data_for_date_from_api(team=away_team,
                                                               game_date=game_date)
             
-
+        
+        # assign game to season model
+        season_id = game_json.get("season")
+        season = Season.objects.filter(id=season_id).first()
+        
         game = Game(id=game_id,
+                    season=season,
                     game_date=game_date,
                     game_json=game_json,
                     home_team=home_team,
@@ -75,6 +83,12 @@ def fetch_games_for_date(date : datetime, get_team_data : bool = True):
     Returns True in the case that there are games on the given date,
     False otherwise.
     """
+
+    # first check to see if the games already exist before calling API
+    games_for_date_in_db = Game.objects.filter(game_date=date)
+    if games_for_date_in_db.exists():
+        return games_for_date_in_db
+    
     date_string = date.strftime("%Y-%m-%d")
     schedule_url = f"https://api-web.nhle.com/v1/schedule/{date_string}"
     schedule_response = httpx.get(schedule_url)
@@ -265,9 +279,9 @@ def load_games_for_team_from_api(team_abbreviation : str, seasons : list, get_te
                 if game_date < current_date and get_team_data and not (home_team_goals == 0 and away_team_goals == 0):
                     winning_team = home_team if home_team_goals > away_team_goals else away_team
                     home_team_data = load_team_data_for_date_from_api(team=home_team,
-                                                                    game_date=game_date)
+                                                                      game_date=game_date)
                     away_team_data = load_team_data_for_date_from_api(team=away_team,
-                                                                    game_date=game_date)
+                                                                      game_date=game_date)
                     
 
                 game = Game(id=game_id,
@@ -323,3 +337,61 @@ def clear_database():
     Game.objects.all().delete()
     TeamData.objects.all().delete()
 
+@transaction.atomic
+def update_completed_games() -> list:
+    today = timezone.localdate()
+    completed_games_dates = Game.objects.filter(winning_team__isnull=True, game_date__lt=today).values_list("game_date", flat=True).distinct()
+    games_to_update = []
+    team_datas_to_create = []
+
+    for game_date in completed_games_dates:
+        date_string = game_date.strftime("%Y-%m-%d")
+        schedule_url = f"https://api-web.nhle.com/v1/schedule/{date_string}"
+        schedule_response = httpx.get(schedule_url)
+        response_json = schedule_response.json()
+        games_for_date_json = response_json.get("gameWeek")[0].get("games", [])
+
+        for game_json in games_for_date_json:
+            game = Game.objects.filter(id=game_json.get("id")).first()
+            if game is not None:
+                # update the game_json field
+                game.game_json = game_json
+
+                # find the winning team and store
+                home_team_json = game_json.get("homeTeam", {})
+                away_team_json = game_json.get("awayTeam", {})
+                home_team_goals = home_team_json.get("score", 0)
+                away_team_goals = away_team_json.get("score", 0)
+
+                away_team_abbreviation = away_team_json.get("abbrev")
+                away_team = Team.objects.filter(abbreviation=away_team_abbreviation).first()
+
+                home_team_abbreviation = home_team_json.get("abbrev")
+                home_team = Team.objects.filter(abbreviation=home_team_abbreviation).first()
+
+                winning_team = home_team if home_team_goals > away_team_goals else away_team
+                game.winning_team = winning_team
+
+                # fetch team data if it has not yet been created
+                if game.home_team_data is None:
+                    home_team_data = load_team_data_for_date_from_api(team=home_team,
+                                                                    game_date=game_date)
+                    if home_team_data is not None:
+                        team_datas_to_create.append(home_team_data)
+                    
+                if game.away_team_data is None:
+                    away_team_data = load_team_data_for_date_from_api(team=away_team,
+                                                                    game_date=game_date)
+                    if away_team_data is not None:
+                        team_datas_to_create.append(away_team_data)
+
+                games_to_update.append(game)
+
+    if team_datas_to_create:
+        TeamData.objects.bulk_create(team_datas_to_create)
+    
+    if games_to_update:
+        Game.objects.bulk_update(games_to_update,
+                                 ["game_json", "winning_team", "home_team_data", "away_team_data"])
+        
+    return games_to_update

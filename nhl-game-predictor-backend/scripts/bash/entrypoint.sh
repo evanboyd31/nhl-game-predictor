@@ -2,6 +2,9 @@
 
 set -e
 
+# wait for Postgres to be available
+/app/scripts/bash/wait-for-postgres.sh
+
 # check for migrations and apply if necessary
 poetry run python manage.py makemigrations --noinput
 poetry run python manage.py migrate --noinput

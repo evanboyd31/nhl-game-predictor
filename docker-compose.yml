@@ -27,6 +27,15 @@ services:
       - PREDICT_GAMES_TODAY_ACCESS_TOKEN=${PREDICT_GAMES_TODAY_ACCESS_TOKEN}
       - KEEP_ACTIVE_ACCESS_TOKEN=${KEEP_ACTIVE_ACCESS_TOKEN}
       - FETCH_GAMES_TOKEN=${FETCH_GAMES_TOKEN}
+      - UPDATE_COMPLETED_GAMES_TOKEN=${UPDATE_COMPLETED_GAMES_TOKEN}
+      - PROD_DATABASE_NAME=${PROD_DATABASE_NAME}
+      - PROD_DATABASE_USER=${PROD_DATABASE_USER}
+      - PROD_DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
+      - PROD_DATABASE_HOST=${PROD_DATABASE_HOST}
+      - PROD_DATABASE_PORT=${PROD_DATABASE_PORT}
+    volumes:
+      - ./nhl-game-predictor-backend:/app:cached
+      - /app/.venv # this prevents host code from overwriting virtualenv in container
     ports:
       - "8001:8000"
     depends_on:
@@ -38,6 +47,9 @@ services:
       context: ./nhl-game-predictor-frontend
     environment:
       - REACT_APP_BASE_API_URL=${REACT_APP_BASE_API_URL}
+    volumes:
+      - ./nhl-game-predictor-frontend:/app:cached
+      - /app/.venv # this prevents host code from overwriting virtualenv in container
     ports:
       - "3000:3000"
     depends_on:
