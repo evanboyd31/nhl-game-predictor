@@ -8,7 +8,7 @@ def assign_season_to_preseason_playoff_games(apps, schema_editor):
   PLAYOFFS = 3
 
   season_map = {
-      s.season_id: s
+      s.id: s
       for s in Season.objects.all()
   }
 
