@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor")
 django.setup()
 
 from django.conf import settings
-from games.models import Franchise, Team, Game, TeamData
+from games.models import Franchise, Team, Game, TeamData, Season
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.db import transaction
@@ -24,7 +24,6 @@ REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
 def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, get_team_data : bool = False):
     game_id = game_json.get("id")
-    game_type = game_json.get("gameType")
     game_date = datetime.strptime(date_string, "%Y-%m-%d").date()
     current_date = timezone.localdate()
 
@@ -33,7 +32,7 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
     home_team_goals = home_team_json.get("score", 0)
     away_team_goals = away_team_json.get("score", 0)
 
-    # only create game data when it is not preseason game and doesn't already exist
+    # only create game data when it doesn't already exist
     game = None
     home_team_data = None
     away_team_data = None
@@ -59,8 +58,13 @@ def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, 
             away_team_data = load_team_data_for_date_from_api(team=away_team,
                                                               game_date=game_date)
             
-
+        
+        # assign game to season model
+        season_id = game_json.get("season")
+        season = Season.objects.filter(id=season_id).first()
+        
         game = Game(id=game_id,
+                    season=season,
                     game_date=game_date,
                     game_json=game_json,
                     home_team=home_team,
