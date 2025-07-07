@@ -33,7 +33,7 @@ def load_random_forest_model():
     with open(model_path, 'rb') as file:
         model = pickle.load(file)
     
-    return model
+    return model, latest_model
 
 def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : pd.DataFrame, model, training_features : pd.DataFrame) -> dict:
     """
@@ -137,11 +137,14 @@ def predict_games(games : QuerySet[Game]) -> list:
     """
 
     # Load the latest model
-    model = load_random_forest_model()
+    model, model_object = load_random_forest_model()
+
+    # obtain the entire seasons dataset for the most recent model
+    trained_seasons = list(model_object.trained_seasons.values_list("id", flat=True))
+    seasons_dataframe = create_seasons_dataframe(trained_seasons)
 
     # get training features
-    # get the data that was used to train the model (will need to update this in the PredictionModel class)
-    training_features, _, _, _= create_training_data(create_seasons_dataframe([20222023,20232024]))
+    training_features, _, _, _= create_training_data(seasons_dataframe)
 
     predictions = []
     team_data = []
