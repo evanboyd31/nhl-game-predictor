@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
-from utils import one_hot_encode_game_df
+from predictor.ml_models.utils import one_hot_encode_game_df
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -40,7 +40,7 @@ def generate_past_season_ids(past_seasons : list):
     
     return season_ids
 
-def create_seasons_dataframe(past_seasons : list, one_hot_encode=False):
+def create_seasons_dataframe(past_seasons : list, one_hot_encode : bool = False):
     """
     creates a pandas dataframe of all games that took place in the
     list of seasons in past_seasons array of season IDs
@@ -81,13 +81,14 @@ def create_training_data(game_data_df : pd.DataFrame):
                             random_state=31)
 
 @transaction.atomic
-def train_random_forest(past_seasons : list):
+def train_random_forest(past_seasons : list, one_hot_encode : bool = False):
     """
     trains a new Random Forest model on the seasons in the past_seasons array.
     for example, calling train_random_forest([20242025, 20232024]) will train 
     a new Random Forest using data from the 2024-2025 and 2023-2024 NHL seasons
     """
-    game_data_df = create_seasons_dataframe(past_seasons=past_seasons)
+    game_data_df = create_seasons_dataframe(past_seasons=past_seasons,
+                                            one_hot_encode=one_hot_encode)
 
     training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
 
