@@ -12,6 +12,14 @@ class GameDataFrameEntry:
     a Random Forest model
     """
 
+    categorical_features = [
+        "home_team",
+        "away_team",
+        "game_type",
+        "game_day_of_week",
+        "game_month"
+    ]
+
     def __init__(self, game: Game):
         game_json = game.game_json
         home_team_data = game.home_team_data
