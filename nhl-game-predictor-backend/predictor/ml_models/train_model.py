@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
+from utils import one_hot_encode_game_df
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -39,13 +40,15 @@ def generate_past_season_ids(past_seasons : list):
     
     return season_ids
 
-def create_seasons_dataframe(past_seasons : list):
+def create_seasons_dataframe(past_seasons : list, one_hot_encode=False):
     """
     creates a pandas dataframe of all games that took place in the
     list of seasons in past_seasons array of season IDs
     """
     # fetch all Game records for the specified past seasons
-    games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
+    games = Game.objects.filter(
+        game_json__season__in=past_seasons
+    ).exclude(home_team_data=None, away_team_data=None)
 
     # create GameDataFrameEntry instances for each game
     game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
@@ -55,6 +58,10 @@ def create_seasons_dataframe(past_seasons : list):
 
     # create a DataFrame from the list of dictionaries
     game_data_df = pd.DataFrame(game_data_dicts)
+
+    # apply one-hot encoding if requested
+    if one_hot_encode:
+        game_data_df = one_hot_encode_game_df(game_data_df)
 
     return game_data_df
 
