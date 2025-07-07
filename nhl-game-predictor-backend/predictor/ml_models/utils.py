@@ -1,18 +1,10 @@
-from games.models import Game
+from games.models import Game, Franchise
 import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
-
-class GameDataFrameEntry:
-    """
-    class to represent a Game model instance
-    as an entry in a pandas dataframe used for training
-    a Random Forest model
-    """
-
-    CATEGORICAL_FEATURE_NAMES = [
+CATEGORICAL_FEATURE_NAMES = [
         "home_team",
         "away_team",
         "game_type",
@@ -20,15 +12,28 @@ class GameDataFrameEntry:
         "game_month"
     ]
 
-    GAME_TYPES = [
-        Game.PRESEASON,
-        Game.REGULAR_SEASON,
-        Game.PLAYOFFS
-    ]
+POSSIBLE_GAME_FRANCHISES = Franchise.objects.filter(
+    teams__in=Game.objects.values_list("home_team", flat=True).union(
+        Game.objects.values_list("away_team", flat=True)
+        )
+).distinct()
 
-    GAME_DAYS_OF_WEEK = list(range(7))
+GAME_TYPES = [
+    Game.PRESEASON,
+    Game.REGULAR_SEASON,
+    Game.PLAYOFFS
+]
 
-    GAME_MONTHS = list(range(1, 13))
+GAME_DAYS_OF_WEEK = list(range(7))
+
+GAME_MONTHS = list(range(1, 13))
+
+class GameDataFrameEntry:
+    """
+    class to represent a Game model instance
+    as an entry in a pandas dataframe used for training
+    a Random Forest model
+    """
 
     def __init__(self, game: Game):
         game_json = game.game_json
