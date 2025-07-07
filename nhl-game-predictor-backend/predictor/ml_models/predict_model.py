@@ -8,7 +8,7 @@ import pandas as pd
 
 from django.db import transaction
 from games.models import Game, GamePrediction, TeamData
-from predictor.ml_models.utils import GameDataFrameEntry
+from predictor.ml_models.utils import GameDataFrameEntry, one_hot_encode_game_df
 from predictor.models import PredictionModel
 from predictor.ml_models.train_model import create_seasons_dataframe, create_training_data
 from lime.lime_tabular import LimeTabularExplainer
@@ -94,6 +94,9 @@ def predict_game_outcome(game : Game, model, training_features : pd.DataFrame) -
     # prepare game data for dataframe and prediction
     game_data_frame_entry = GameDataFrameEntry(game)
     game_data_df = pd.DataFrame([game_data_frame_entry.to_dict()])
+
+    # one hot encode the dataframe
+    game_data_df = one_hot_encode_game_df(game_data_df=game_data_df)
 
     # drop the label column (if included) for prediction
     if 'home_team_win' in game_data_df.columns:
