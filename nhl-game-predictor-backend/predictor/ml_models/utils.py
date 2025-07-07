@@ -30,6 +30,9 @@ GAME_DAYS_OF_WEEK = list(range(7))
 
 GAME_MONTHS = list(range(1, 13))
 
+def categorical_feature_column_name_prefix(name, val):
+    return f"{name}_{val}"
+
 class GameDataFrameEntry:
     """
     class to represent a Game model instance
