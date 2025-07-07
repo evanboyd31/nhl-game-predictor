@@ -40,7 +40,7 @@ def generate_past_season_ids(past_seasons : list):
     
     return season_ids
 
-def create_seasons_dataframe(past_seasons : list, one_hot_encode : bool = False):
+def create_seasons_dataframe(past_seasons : list):
     """
     creates a pandas dataframe of all games that took place in the
     list of seasons in past_seasons array of season IDs
@@ -59,9 +59,8 @@ def create_seasons_dataframe(past_seasons : list, one_hot_encode : bool = False)
     # create a DataFrame from the list of dictionaries
     game_data_df = pd.DataFrame(game_data_dicts)
 
-    # apply one-hot encoding if requested
-    if one_hot_encode:
-        game_data_df = one_hot_encode_game_df(game_data_df)
+    # apply one-hot encoding
+    game_data_df = one_hot_encode_game_df(game_data_df)
 
     return game_data_df
 
@@ -81,14 +80,13 @@ def create_training_data(game_data_df : pd.DataFrame):
                             random_state=31)
 
 @transaction.atomic
-def train_random_forest(past_seasons : list, one_hot_encode : bool = False):
+def train_random_forest(past_seasons : list):
     """
     trains a new Random Forest model on the seasons in the past_seasons array.
     for example, calling train_random_forest([20242025, 20232024]) will train 
     a new Random Forest using data from the 2024-2025 and 2023-2024 NHL seasons
     """
-    game_data_df = create_seasons_dataframe(past_seasons=past_seasons,
-                                            one_hot_encode=one_hot_encode)
+    game_data_df = create_seasons_dataframe(past_seasons=past_seasons)
 
     training_features, testing_features, training_labels, testing_labels = create_training_data(game_data_df=game_data_df)
 
