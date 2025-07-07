@@ -1,4 +1,5 @@
 from django.db import models
+from games.models import Season
 
 class PredictionModel(models.Model):
     """
@@ -6,6 +7,7 @@ class PredictionModel(models.Model):
     """
     name = models.CharField(max_length=100)
     version = models.CharField(max_length=50)
+    trained_seasons = models.ManyToManyField(Season, related_name="prediction_models")
 
     class Meta:
         unique_together = ("name", "version")
