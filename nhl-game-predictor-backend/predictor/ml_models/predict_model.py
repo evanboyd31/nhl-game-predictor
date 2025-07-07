@@ -49,11 +49,11 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
     )
 
     # get the prediction probabilities for the specific instance
-    instance = game_data_df.values[0] 
-    _ = model.predict_proba(instance.reshape(1, -1))
+    instance = game_data_df.iloc[0:1]
+    _ = model.predict_proba(instance)
 
     # Explain the prediction
-    exp = explainer.explain_instance(instance, model.predict_proba)
+    exp = explainer.explain_instance(instance.values[0], model.predict_proba)
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
     top_features = sorted(exp.as_list(), 
@@ -155,8 +155,12 @@ def predict_games(games : QuerySet[Game]) -> list:
         game.home_team_data = home_team_data
         game.away_team_data = away_team_data
 
-        team_data.append(home_team_data)
-        team_data.append(away_team_data)
+        if home_team_data.id is not None:
+            team_data.append(home_team_data)
+        
+        if away_team_data.id is not None:
+            team_data.append(away_team_data)
+
         games_data.append(game)
 
         game_prediction = predict_game_outcome(game=game,
@@ -165,7 +169,7 @@ def predict_games(games : QuerySet[Game]) -> list:
         predictions.append(game_prediction)
 
     if team_data:
-        TeamData.objects.bulk_create(team_data)
+        TeamData.objects.bulk_create(team_data, ignore_conflicts=True)
     
     if games_data:
         Game.objects.bulk_update(games_data, 
