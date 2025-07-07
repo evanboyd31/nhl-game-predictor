@@ -12,11 +12,13 @@ CATEGORICAL_FEATURE_NAMES = [
         "game_month"
     ]
 
-POSSIBLE_GAME_FRANCHISES = Franchise.objects.filter(
+# we only consider franchises that have participated in a game that is stored in the DB, not all franchises
+# otherwise, a lot of the data columns would go unused
+POSSIBLE_GAME_FRANCHISES_IDS = Franchise.objects.filter(
     teams__in=Game.objects.values_list("home_team", flat=True).union(
         Game.objects.values_list("away_team", flat=True)
         )
-).distinct()
+).distinct().order_by("id").values_list("id", flat=True)
 
 GAME_TYPES = [
     Game.PRESEASON,
