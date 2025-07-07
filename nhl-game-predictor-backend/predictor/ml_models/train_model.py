@@ -4,7 +4,7 @@ import pandas as pd
 from django.db import transaction
 from django.db.models import Max
 from predictor.models import PredictionModel
-from games.models import Game
+from games.models import Game, Season
 from django.utils import timezone
 import pickle
 import pandas as pd
@@ -110,7 +110,11 @@ def train_random_forest(past_seasons : list):
     else:
         new_version = "1.0"
 
-    prediction_model = PredictionModel.objects.create(name="Random Forest", version=new_version)
+    prediction_model = PredictionModel.objects.create(name="Random Forest", 
+                                                      version=new_version)
+    trained_seasons = Season.objects.filter(id__in=past_seasons)
+    prediction_model.trained_seasons.set(trained_seasons)
+    
     with open(f'./predictor/ml_models/trained_models/random-forest-v-{new_version.replace(".","-")}.pkl', 'wb') as file:
         pickle.dump(random_forest, file)
 
