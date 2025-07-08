@@ -45,11 +45,7 @@ def one_hot_encode_game_df(game_data_df: pd.DataFrame) -> pd.DataFrame:
     """
 
     game_data_df = pd.get_dummies(game_data_df, 
-                                  columns=["home_team", 
-                                           "away_team", 
-                                           "game_type", 
-                                           "game_day_of_week", 
-                                           "game_month"], 
+                                  columns=CATEGORICAL_FEATURE_NAMES, 
                                   dtype=int)
 
     # ensure all expected one-hot columns are present (even if not in this row)
