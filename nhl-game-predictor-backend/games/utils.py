@@ -32,6 +32,16 @@ weekday_dictionary = {
 }
 
 """
+provided an integer in the range [1, 3], this dictionary
+maps the integer to the corresponding game type description
+"""
+game_type_dictionary = {
+  1: "The game is a preseason game",
+  2: "The game is a regular season game",
+  3: "The game is a playoff game"
+}
+
+"""
 given a feature name used in the machine learning training, this dictionary 
 provides a function that, when given the instance of the Game, will be formatted 
 into a string that is descriptive and contains relevant stats. useful for displaying
@@ -40,7 +50,7 @@ feature importances in the React frontend
 cleaned_feature_names_dictionary = {
     "home_team": lambda game: f"The {game.home_team.name} are the home team",
     "away_team": lambda game: f"The {game.away_team.name} are the away team",
-    "game_type": lambda game: "The game is a regular season game" if game.game_json.get("gameTypeId") == 1 else "The game is a playoff game",
+    "game_type": lambda game: game_type_dictionary[game.game_json.get("gameTypeId")],
     "game_month": lambda game: f"The game is in {month_dictionary[game.game_date.month]}",
     "game_day_of_week": lambda game: f"The game is on a {weekday_dictionary[game.game_date.weekday()]}",
 
