@@ -8,7 +8,7 @@ import pandas as pd
 
 from django.db import transaction
 from games.models import Game, GamePrediction, TeamData
-from predictor.ml_models.utils import GameDataFrameEntry
+from predictor.ml_models.utils import GameDataFrameEntry, one_hot_encode_game_df
 from predictor.models import PredictionModel
 from predictor.ml_models.train_model import create_seasons_dataframe, create_training_data
 from lime.lime_tabular import LimeTabularExplainer
@@ -33,7 +33,7 @@ def load_random_forest_model():
     with open(model_path, 'rb') as file:
         model = pickle.load(file)
     
-    return model
+    return model, latest_model
 
 def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : pd.DataFrame, model, training_features : pd.DataFrame) -> dict:
     """
@@ -49,11 +49,11 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
     )
 
     # get the prediction probabilities for the specific instance
-    instance = game_data_df.values[0] 
-    _ = model.predict_proba(instance.reshape(1, -1))
+    instance = game_data_df.iloc[0:1]
+    _ = model.predict_proba(instance)
 
     # Explain the prediction
-    exp = explainer.explain_instance(instance, model.predict_proba)
+    exp = explainer.explain_instance(instance.values[0], model.predict_proba)
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
     top_features = sorted(exp.as_list(), 
@@ -95,6 +95,9 @@ def predict_game_outcome(game : Game, model, training_features : pd.DataFrame) -
     game_data_frame_entry = GameDataFrameEntry(game)
     game_data_df = pd.DataFrame([game_data_frame_entry.to_dict()])
 
+    # one hot encode the dataframe
+    game_data_df = one_hot_encode_game_df(game_data_df=game_data_df)
+
     # drop the label column (if included) for prediction
     if 'home_team_win' in game_data_df.columns:
         game_data_df = game_data_df.drop(columns=['home_team_win'])
@@ -134,11 +137,14 @@ def predict_games(games : QuerySet[Game]) -> list:
     """
 
     # Load the latest model
-    model = load_random_forest_model()
+    model, model_object = load_random_forest_model()
+
+    # obtain the entire seasons dataset for the most recent model
+    trained_seasons = list(model_object.trained_seasons.values_list("id", flat=True))
+    seasons_dataframe = create_seasons_dataframe(trained_seasons)
 
     # get training features
-    # get the data that was used to train the model (will need to update this in the PredictionModel class)
-    training_features, _, _, _= create_training_data(create_seasons_dataframe([20222023,20232024]))
+    training_features, _, _, _= create_training_data(seasons_dataframe)
 
     predictions = []
     team_data = []
@@ -149,8 +155,12 @@ def predict_games(games : QuerySet[Game]) -> list:
         game.home_team_data = home_team_data
         game.away_team_data = away_team_data
 
-        team_data.append(home_team_data)
-        team_data.append(away_team_data)
+        if home_team_data.id is not None:
+            team_data.append(home_team_data)
+        
+        if away_team_data.id is not None:
+            team_data.append(away_team_data)
+
         games_data.append(game)
 
         game_prediction = predict_game_outcome(game=game,
@@ -159,7 +169,7 @@ def predict_games(games : QuerySet[Game]) -> list:
         predictions.append(game_prediction)
 
     if team_data:
-        TeamData.objects.bulk_create(team_data)
+        TeamData.objects.bulk_create(team_data, ignore_conflicts=True)
     
     if games_data:
         Game.objects.bulk_update(games_data, 

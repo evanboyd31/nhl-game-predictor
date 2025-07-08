@@ -1,3 +1,15 @@
+from predictor.ml_models.utils import POSSIBLE_GAME_FRANCHISE_IDS
+
+home_team_feature_descriptions = {
+  f"home_team_{franchise_id}": lambda game: f"The {game.home_team.name} are the home team"
+  for franchise_id in POSSIBLE_GAME_FRANCHISE_IDS
+}
+
+away_team_feature_descriptions = {
+  f"away_team_{franchise_id}": lambda game: f"The {game.away_team.name} are the away team"
+  for franchise_id in POSSIBLE_GAME_FRANCHISE_IDS
+}
+
 """
 provided an integer in the range [1, 12], this dictionary
 maps the integer to the corresponding month name
@@ -17,6 +29,12 @@ month_dictionary = {
     12: "December"
 }
 
+month_feature_descriptions = {
+    f"game_month_{month_num}": lambda game: f"The game is in {month_name}"
+    for month_num, month_name in month_dictionary.items()
+}
+
+
 """
 provided an integer in the range [0, 6], this dictionary
 maps the integer to the corresponding day of week name
@@ -31,6 +49,26 @@ weekday_dictionary = {
     6: "Sunday"
 }
 
+weekday_feature_descriptions = {
+    f"game_day_of_week_{weekday_num}": lambda game: f"The game is on a {weekday_name}"
+    for weekday_num, weekday_name in weekday_dictionary.items()
+}
+
+"""
+provided an integer in the range [1, 3], this dictionary
+maps the integer to the corresponding game type description
+"""
+game_type_dictionary = {
+  1: "The game is a preseason game",
+  2: "The game is a regular season game",
+  3: "The game is a playoff game"
+}
+
+game_type_feature_descriptions = {
+    f"game_type_{game_type_num}": lambda game: description
+    for game_type_num, description in game_type_dictionary.items()
+}
+
 """
 given a feature name used in the machine learning training, this dictionary 
 provides a function that, when given the instance of the Game, will be formatted 
@@ -38,12 +76,6 @@ into a string that is descriptive and contains relevant stats. useful for displa
 feature importances in the React frontend
 """
 cleaned_feature_names_dictionary = {
-    "home_team": lambda game: f"The {game.home_team.name} are the home team",
-    "away_team": lambda game: f"The {game.away_team.name} are the away team",
-    "game_type": lambda game: "The game is a regular season game" if game.game_json.get("gameTypeId") == 1 else "The game is a playoff game",
-    "game_month": lambda game: f"The game is in {month_dictionary[game.game_date.month]}",
-    "game_day_of_week": lambda game: f"The game is on a {weekday_dictionary[game.game_date.weekday()]}",
-
     # Home team overall metrics
     "home_team_win_percentage": lambda game: f"The {game.home_team.name} have a win percentage of {(game.home_team_data.team_data_json.get('wins', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "home_team_loss_percentage": lambda game: f"The {game.home_team.name} have a regulation loss percentage of {(game.home_team_data.team_data_json.get('losses', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
@@ -92,4 +124,10 @@ cleaned_feature_names_dictionary = {
     # Label for outcome
     "home_team_win": lambda game: "The home team won" if game.home_team_win else "The home team lost",
 }
+
+cleaned_feature_names_dictionary.update(home_team_feature_descriptions)
+cleaned_feature_names_dictionary.update(away_team_feature_descriptions)
+cleaned_feature_names_dictionary.update(month_feature_descriptions)
+cleaned_feature_names_dictionary.update(weekday_feature_descriptions)
+cleaned_feature_names_dictionary.update(game_type_feature_descriptions)
 

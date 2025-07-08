@@ -4,7 +4,7 @@ import pandas as pd
 from django.db import transaction
 from django.db.models import Max
 from predictor.models import PredictionModel
-from games.models import Game
+from games.models import Game, Season
 from django.utils import timezone
 import pickle
 import pandas as pd
@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from predictor.ml_models.utils import GameDataFrameEntry
+from predictor.ml_models.utils import one_hot_encode_game_df
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
@@ -45,7 +46,9 @@ def create_seasons_dataframe(past_seasons : list):
     list of seasons in past_seasons array of season IDs
     """
     # fetch all Game records for the specified past seasons
-    games = Game.objects.filter(game_json__season__in=past_seasons).exclude(home_team_data=None, away_team_data=None)
+    games = Game.objects.filter(
+        game_json__season__in=past_seasons
+    ).exclude(home_team_data=None, away_team_data=None)
 
     # create GameDataFrameEntry instances for each game
     game_dataframe_entries = [GameDataFrameEntry(game) for game in games]
@@ -55,6 +58,9 @@ def create_seasons_dataframe(past_seasons : list):
 
     # create a DataFrame from the list of dictionaries
     game_data_df = pd.DataFrame(game_data_dicts)
+
+    # apply one-hot encoding
+    game_data_df = one_hot_encode_game_df(game_data_df)
 
     return game_data_df
 
@@ -104,7 +110,11 @@ def train_random_forest(past_seasons : list):
     else:
         new_version = "1.0"
 
-    prediction_model = PredictionModel.objects.create(name="Random Forest", version=new_version)
+    prediction_model = PredictionModel.objects.create(name="Random Forest", 
+                                                      version=new_version)
+    trained_seasons = Season.objects.filter(id__in=past_seasons)
+    prediction_model.trained_seasons.set(trained_seasons)
+    
     with open(f'./predictor/ml_models/trained_models/random-forest-v-{new_version.replace(".","-")}.pkl', 'wb') as file:
         pickle.dump(random_forest, file)
 
