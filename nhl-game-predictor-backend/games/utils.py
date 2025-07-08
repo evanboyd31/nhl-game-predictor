@@ -1,5 +1,15 @@
 from predictor.ml_models.utils import POSSIBLE_GAME_FRANCHISE_IDS
 
+home_team_feature_descriptions = {
+  f"home_team_{franchise_id}": lambda game: f"The {game.home_team.name} are the home team"
+  for franchise_id in POSSIBLE_GAME_FRANCHISE_IDS
+}
+
+away_team_feature_descriptions = {
+  f"away_team_{franchise_id}": lambda game: f"The {game.away_team.name} are the away team"
+  for franchise_id in POSSIBLE_GAME_FRANCHISE_IDS
+}
+
 """
 provided an integer in the range [1, 12], this dictionary
 maps the integer to the corresponding month name
@@ -66,9 +76,6 @@ into a string that is descriptive and contains relevant stats. useful for displa
 feature importances in the React frontend
 """
 cleaned_feature_names_dictionary = {
-    "home_team": lambda game: f"The {game.home_team.name} are the home team",
-    "away_team": lambda game: f"The {game.away_team.name} are the away team",
-
     # Home team overall metrics
     "home_team_win_percentage": lambda game: f"The {game.home_team.name} have a win percentage of {(game.home_team_data.team_data_json.get('wins', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
     "home_team_loss_percentage": lambda game: f"The {game.home_team.name} have a regulation loss percentage of {(game.home_team_data.team_data_json.get('losses', 0) / max(1, game.home_team_data.team_data_json.get('gamesPlayed', 1))) * 100:.2f}%",
@@ -118,6 +125,8 @@ cleaned_feature_names_dictionary = {
     "home_team_win": lambda game: "The home team won" if game.home_team_win else "The home team lost",
 }
 
+cleaned_feature_names_dictionary.update(home_team_feature_descriptions)
+cleaned_feature_names_dictionary.update(away_team_feature_descriptions)
 cleaned_feature_names_dictionary.update(month_feature_descriptions)
 cleaned_feature_names_dictionary.update(weekday_feature_descriptions)
 cleaned_feature_names_dictionary.update(game_type_feature_descriptions)
