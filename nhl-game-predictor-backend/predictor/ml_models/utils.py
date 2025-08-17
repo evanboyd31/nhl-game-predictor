@@ -1,9 +1,72 @@
-from games.models import Game
+from games.models import Game, Franchise
 import os
 import django
+import pandas as pd
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
+CATEGORICAL_FEATURE_NAMES = [
+        "home_team",
+        "away_team",
+        "game_type",
+        "game_day_of_week",
+        "game_month"
+    ]
+
+# we only consider franchises that have participated in a game that is stored in the DB, not all franchises
+# otherwise, a lot of the data columns would go unused
+POSSIBLE_GAME_FRANCHISE_IDS = Franchise.objects.filter(
+    teams__in=Game.objects.values_list("home_team", flat=True).union(
+        Game.objects.values_list("away_team", flat=True)
+        )
+).distinct().order_by("id").values_list("id", flat=True)
+
+GAME_TYPES = [
+    Game.PRESEASON,
+    Game.REGULAR_SEASON,
+    Game.PLAYOFFS
+]
+
+GAME_DAYS_OF_WEEK = list(range(7))
+
+GAME_MONTHS = list(range(1, 13))
+
+def categorical_feature_column_name_prefix(categorical_feature_name, categorical_feature_value):
+    """
+    creates a name for a categorical feature column based on the name of the feature
+    and the value is takes on
+    """
+    return f"{categorical_feature_name}_{categorical_feature_value}"
+
+def one_hot_encode_game_df(game_data_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    One-hot encode known categorical columns of the input DataFrame,
+    ensuring all expected dummy columns exist, even if missing from input.
+    """
+
+    game_data_df = pd.get_dummies(game_data_df, 
+                                  columns=CATEGORICAL_FEATURE_NAMES, 
+                                  dtype=int)
+
+    # ensure all expected one-hot columns are present (even if not in this row)
+    expected_columns = []
+
+    for categorical_feature_name, categorical_feature_values in {
+        "home_team": POSSIBLE_GAME_FRANCHISE_IDS,
+        "away_team": POSSIBLE_GAME_FRANCHISE_IDS,
+        "game_type": GAME_TYPES,
+        "game_day_of_week": GAME_DAYS_OF_WEEK,
+        "game_month": GAME_MONTHS,
+    }.items():
+        expected_columns += [f"{categorical_feature_name}_{categorical_feature_value}" for categorical_feature_value in categorical_feature_values]
+
+    # add any missing one-hot columns with 0s
+    for column in expected_columns:
+        if column not in game_data_df.columns:
+            game_data_df[column] = 0
+
+    # sort to ensure consistent column order
+    return game_data_df.reindex(sorted(game_data_df.columns), axis=1)
 
 class GameDataFrameEntry:
     """

@@ -48,6 +48,8 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ('home_team__name', 'away_team__name')
     date_hierarchy = 'game_date'
 
+    readonly_fields = ('home_game_number_display', 'away_game_number_display', 'is_completed')
+
     def is_completed(self, obj : Game):
         """
         displays the is_completed() return result of a Game
@@ -57,6 +59,14 @@ class GameAdmin(admin.ModelAdmin):
     
     is_completed.boolean = True
     is_completed.short_description = 'Completed'
+
+    def home_game_number_display(self, obj: Game):
+        return obj.home_team_game_number()
+    home_game_number_display.short_description = 'Home Team Game #'
+
+    def away_game_number_display(self, obj: Game):
+        return obj.away_team_game_number()
+    away_game_number_display.short_description = 'Away Team Game #'
 
 
 @admin.register(GamePrediction)

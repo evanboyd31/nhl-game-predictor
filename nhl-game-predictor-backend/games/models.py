@@ -16,7 +16,7 @@ class Franchise(models.Model):
 class Team(models.Model):
     franchise = models.ForeignKey(Franchise, on_delete=models.CASCADE, related_name='teams', null=True)
     name = models.CharField(max_length=100)
-    abbreviation = models.CharField(max_length=3, unique=True)
+    abbreviation = models.CharField(max_length=3)
     logo_url = models.URLField()
 
     def __str__(self):
@@ -95,6 +95,68 @@ class Game(models.Model):
         """
         current_date = timezone.localdate()
         return current_date > self.game_date
+    
+    def home_team_game_number(self):
+        game_type = self.game_json.get("gameType")
+
+        def combined_games(game_type):
+            home_games = Game.objects.filter(
+                game_json__gameType=game_type,
+                home_team=self.home_team,
+                season=self.season,
+                game_date__lte=self.game_date
+            ).exclude(id=self.id)
+
+            away_games = Game.objects.filter(
+                game_json__gameType=game_type,
+                away_team=self.home_team,
+                season=self.season,
+                game_date__lte=self.game_date
+            ).exclude(id=self.id)
+
+            return home_games.union(away_games)
+
+        if game_type == self.PRESEASON:
+            return combined_games(self.PRESEASON).count() + 1
+
+        elif game_type == self.REGULAR_SEASON:
+            return combined_games(self.REGULAR_SEASON).count() + 1
+
+        else:
+            regular_season_count = combined_games(self.REGULAR_SEASON).count()
+            playoff_count = combined_games(self.PLAYOFFS).count()
+            return regular_season_count + playoff_count + 1
+        
+    def away_team_game_number(self):
+        game_type = self.game_json.get("gameType")
+
+        def combined_games(game_type):
+            home_games = Game.objects.filter(
+                game_json__gameType=game_type,
+                home_team=self.away_team,
+                season=self.season,
+                game_date__lte=self.game_date
+            ).exclude(id=self.id)
+
+            away_games = Game.objects.filter(
+                game_json__gameType=game_type,
+                away_team=self.away_team,
+                season=self.season,
+                game_date__lte=self.game_date
+            ).exclude(id=self.id)
+
+            return home_games.union(away_games)
+
+        if game_type == self.PRESEASON:
+            return combined_games(self.PRESEASON).count() + 1
+
+        elif game_type == self.REGULAR_SEASON:
+            return combined_games(self.REGULAR_SEASON).count() + 1
+
+        else:
+            regular_season_count = combined_games(self.REGULAR_SEASON).count()
+            playoff_count = combined_games(self.PLAYOFFS).count()
+            return regular_season_count + playoff_count + 1
     
 
 class GamePrediction(models.Model):
