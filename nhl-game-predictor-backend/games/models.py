@@ -16,7 +16,7 @@ class Franchise(models.Model):
 class Team(models.Model):
     franchise = models.ForeignKey(Franchise, on_delete=models.CASCADE, related_name='teams', null=True)
     name = models.CharField(max_length=100)
-    abbreviation = models.CharField(max_length=3, unique=True)
+    abbreviation = models.CharField(max_length=3)
     logo_url = models.URLField()
 
     def __str__(self):
