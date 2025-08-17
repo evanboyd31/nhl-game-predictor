@@ -11,7 +11,14 @@ def add_utah_mammoth(apps, schema_editor):
     utah_mammoth.save()
 
 def remove_utah_mammoth(apps, schema_editor):
-    pass
+    Team = apps.get_model('games', 'Team')
+    Franchise = apps.get_model('games', 'Franchise')
+
+    utah_mammoth = Team(name="Utah Mammoth",
+                        abbreviation="UTA",
+                        franchise=Franchise.objects.get(id=40))
+    
+    utah_mammoth.delete()
 
 class Migration(migrations.Migration):
 
