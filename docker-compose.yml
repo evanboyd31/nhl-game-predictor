@@ -12,10 +12,10 @@ services:
     ports:
       - "5433:5432"
 
-  backend:
-    container_name: nhl-game-predictor-backend
+  django-backend:
+    container_name: nhl-game-predictor-django-backend
     build:
-      context: ./nhl-game-predictor-backend
+      context: ./nhl-game-predictor-django-backend
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
@@ -34,12 +34,23 @@ services:
       - PROD_DATABASE_HOST=${PROD_DATABASE_HOST}
       - PROD_DATABASE_PORT=${PROD_DATABASE_PORT}
     volumes:
-      - ./nhl-game-predictor-backend:/app:cached
+      - ./nhl-game-predictor-django-backend:/app:cached
       - /app/.venv # this prevents host code from overwriting virtualenv in container
     ports:
       - "8001:8000"
     depends_on:
       - database
+
+  express-backend:
+    container_name: nhl-game-predictor-express-backend
+    build:
+      context: ./nhl-game-predictor-express-backend
+    volumes:
+      - /app/.venv
+    ports:
+      - "8002:8002"
+    depends_on:
+      - django-backend
 
   frontend:
     container_name: nhl-game-predictor-frontend
@@ -53,7 +64,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      - django-backend
+      - express-backend
 
 volumes:
   postgres_data:
