@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8002
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = 'development' ]; then npm run dev; else npm start; fi"]
