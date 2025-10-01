@@ -45,8 +45,11 @@ services:
     container_name: nhl-game-predictor-express-backend
     build:
       context: ./nhl-game-predictor-express-backend
+    environment:
+      - NODE_ENV=${NODE_ENV}
     volumes:
-      - /app/.venv
+      - ./nhl-game-predictor-express-backend:/app:cached
+      - /app/node_modules
     ports:
       - "8002:8002"
     depends_on:
