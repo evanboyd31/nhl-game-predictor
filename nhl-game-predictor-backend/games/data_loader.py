@@ -216,7 +216,9 @@ def load_team_data_for_date_from_api(team : Team, game_date : datetime):
     else:
         # if standings is blank, it is the first game of the season, so only supply date and team
         # all other fields will default to zero
-        return None
+        return TeamData(team_data_json={},
+                        team=team,
+                        data_capture_date=previous_day)
 
 @transaction.atomic
 def load_games_for_team_from_api(team_abbreviation : str, seasons : list, get_team_data : bool = True):
