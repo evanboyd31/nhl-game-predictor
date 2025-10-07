@@ -155,10 +155,10 @@ def predict_games(games : QuerySet[Game]) -> list:
         game.home_team_data = home_team_data
         game.away_team_data = away_team_data
 
-        if home_team_data.id is not None:
+        if home_team_data is not None:
             team_data.append(home_team_data)
         
-        if away_team_data.id is not None:
+        if away_team_data is not None:
             team_data.append(away_team_data)
 
         games_data.append(game)
@@ -168,8 +168,13 @@ def predict_games(games : QuerySet[Game]) -> list:
                                                training_features=training_features)
         predictions.append(game_prediction)
 
+    # need to first create team data before bulk_updating the Games
     if team_data:
         TeamData.objects.bulk_create(team_data, ignore_conflicts=True)
+
+        for td in team_data:
+            if td.id is None:
+                td.id = TeamData.objects.get(team=td.team, data_capture_date=td.data_capture_date).id
     
     if games_data:
         Game.objects.bulk_update(games_data, 
