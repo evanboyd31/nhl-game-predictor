@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 const port = 8002;
 
-app.get("/", (req, res) => {
-  res.send("Hello World from Express!");
+app.get("/api/keep-active", (req, res) => {
+  res.send({ status: "Server is active" });
 });
 
 app.listen(port, () => {
