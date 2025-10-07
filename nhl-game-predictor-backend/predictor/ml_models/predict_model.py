@@ -21,7 +21,7 @@ def load_random_forest_model():
     """
 
     # get latest PredictionModel
-    latest_model = PredictionModel.objects.order_by('-version').first()
+    latest_model = PredictionModel.objects.order_by('-version').last()
     if not latest_model:
         raise ValueError("No models found. Train a model first.")
 
