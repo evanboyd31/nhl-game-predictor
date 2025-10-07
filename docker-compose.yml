@@ -33,6 +33,7 @@ services:
       - PROD_DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
       - PROD_DATABASE_HOST=${PROD_DATABASE_HOST}
       - PROD_DATABASE_PORT=${PROD_DATABASE_PORT}
+      - DJANGO_ENV=${DJANGO_ENV}
     volumes:
       - ./nhl-game-predictor-backend:/app:cached
       - /app/.venv # this prevents host code from overwriting virtualenv in container

@@ -17,7 +17,7 @@ class ServerPinger:
   def ping(self):
     headers = {self.header_name: self.token}
     try:
-      response = httpx.get(self.url, headers=headers, params=self.params)
+      response = httpx.get(self.url, headers=headers, params=self.params, timeout=120)
       if response.status_code == 200:
         print(f"Successfully pinged {response.url}")
       else:

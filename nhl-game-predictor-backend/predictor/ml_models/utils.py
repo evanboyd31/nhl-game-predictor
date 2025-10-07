@@ -173,9 +173,9 @@ class GameDataFrameEntry:
     def __init__(self, game: Game):
         game_json = game.game_json
         home_team_data = game.home_team_data
-        home_team_data_json = home_team_data.team_data_json
+        home_team_data_json = {} if home_team_data is None else home_team_data.team_data_json
         away_team_data = game.away_team_data
-        away_team_data_json = away_team_data.team_data_json
+        away_team_data_json = {} if away_team_data is None else away_team_data.team_data_json
         
         # general game data
         self.home_team = game.home_team.franchise.pk
@@ -195,7 +195,7 @@ class GameDataFrameEntry:
         self.home_team_goal_differential_per_game = home_team_data_json.get("goalDifferential", 0) / home_team_games_played
 
 
-        home_team_l10_games_played = home_team_data_json.get("l10GamesPlayed", 1) if game.home_team_data.team_data_json.get("l10GamesPlayed") != 0 else 1
+        home_team_l10_games_played = home_team_data_json.get("l10GamesPlayed", 1) if home_team_data_json.get("l10GamesPlayed") != 0 else 1
         self.home_team_l10_win_percentage = home_team_data_json.get("l10Wins", 0) / home_team_l10_games_played
         self.home_team_l10_loss_percentage = home_team_data_json.get("l10Losses", 0) / home_team_l10_games_played
         self.home_team_l10_ot_losses = home_team_data_json.get("l10OtLosses", 0) / home_team_l10_games_played

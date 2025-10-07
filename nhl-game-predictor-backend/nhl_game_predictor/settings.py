@@ -109,16 +109,29 @@ WSGI_APPLICATION = 'nhl_game_predictor.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DATABASE_NAME"),  # The database name
-        'USER': os.getenv("DATABASE_USER"),             # Your database username
-        'PASSWORD': os.getenv("DATABASE_PASSWORD"),         # Your database password
-        'HOST': os.getenv("DATABASE_HOST"),            # The hostname (leave as 'localhost' if it's on the same server)
-        'PORT': os.getenv("DATABASE_PORT"),                 # The PostgreSQL port (5432 is the default)
+if os.getenv('DJANGO_ENV') == 'prod':
+    DATABASES = { 
+       'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('PROD_DATABASE_NAME'),
+            'USER': os.getenv('PROD_DATABASE_USER'),
+            'PASSWORD': os.getenv('PROD_DATABASE_PASSWORD'),
+            'HOST': os.getenv('PROD_DATABASE_HOST'),
+            'PORT': os.getenv('PROD_DATABASE_PORT'),
+            'OPTIONS': {'sslmode': 'require'},
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv("DATABASE_NAME"),  # The database name
+            'USER': os.getenv("DATABASE_USER"),             # Your database username
+            'PASSWORD': os.getenv("DATABASE_PASSWORD"),         # Your database password
+            'HOST': os.getenv("DATABASE_HOST"),            # The hostname (leave as 'localhost' if it's on the same server)
+            'PORT': os.getenv("DATABASE_PORT"),                 # The PostgreSQL port (5432 is the default)
+        }
+    }
 
 
 
