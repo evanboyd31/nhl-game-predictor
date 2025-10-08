@@ -109,8 +109,8 @@ def fetch_games_for_date(date : datetime, get_team_data : bool = True):
         if away_team_data is not None:
             team_data_to_create.append(away_team_data)
 
-    Game.objects.bulk_create(games_to_create)
     TeamData.objects.bulk_create(team_data_to_create)
+    Game.objects.bulk_create(games_to_create)
 
     return Game.objects.filter(game_date=date)
 
