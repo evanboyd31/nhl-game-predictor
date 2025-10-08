@@ -33,12 +33,32 @@ services:
       - PROD_DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
       - PROD_DATABASE_HOST=${PROD_DATABASE_HOST}
       - PROD_DATABASE_PORT=${PROD_DATABASE_PORT}
-      - DJANGO_ENV=${DJANGO_ENV}
     volumes:
       - ./nhl-game-predictor-backend:/app:cached
       - /app/.venv # this prevents host code from overwriting virtualenv in container
     ports:
       - "8001:8000"
+    depends_on:
+      - database
+
+  backend-prod:
+    container_name: nhl-game-predictor-backend-prod
+    build:
+      context: ../nhl-game-predictor-prod/nhl-game-predictor/nhl-game-predictor-backend
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_NAME=${PROD_DATABASE_NAME}
+      - DATABASE_USER=${PROD_DATABASE_USER}
+      - DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
+      - DATABASE_HOST=${PROD_DATABASE_HOST}
+      - DATABASE_PORT=${PROD_DATABASE_PORT}
+      - PREDICT_GAMES_TODAY_ACCESS_TOKEN=${PREDICT_GAMES_TODAY_ACCESS_TOKEN}
+      - KEEP_ACTIVE_ACCESS_TOKEN=${KEEP_ACTIVE_ACCESS_TOKEN}
+      - FETCH_GAMES_TOKEN=${FETCH_GAMES_TOKEN}
+      - UPDATE_COMPLETED_GAMES_TOKEN=${UPDATE_COMPLETED_GAMES_TOKEN}
+    ports:
+      - "8003:8000"
     depends_on:
       - database
 
