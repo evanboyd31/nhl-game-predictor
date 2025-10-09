@@ -8,6 +8,7 @@ class PredictionModel(models.Model):
     name = models.CharField(max_length=100)
     version = models.CharField(max_length=50)
     trained_seasons = models.ManyToManyField(Season, related_name="prediction_models")
+    feature_importances = models.JSONField(blank=True, null=True)
 
     class Meta:
         unique_together = ("name", "version")
