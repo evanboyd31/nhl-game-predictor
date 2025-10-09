@@ -15,10 +15,19 @@ const App = () => {
   const [predictions, setPredictions] = useState([]);
 
   // whether the game predictions API has responded
-  const [loading, setLoading] = useState(true);
+  const [loadingGamePredictions, setLoadingGamePredictions] = useState(true);
 
   // holds the error returned by the game predictions API endpoint
-  const [error, setError] = useState(null);
+  const [gamePredictionsError, setGamePredicitonError] = useState(null);
+
+  // game prediction model used for creating the loaded predictions
+  const [predictionModel, setPredictionModel] = useState({});
+
+  // whether the prediction model API has responded
+  const [loadingPredictionModel, setLoadingPredictionModel] = useState(true);
+
+  // holds the error returned by the prediction model API endpoint
+  const [predictionModelError, setPredictionModelError] = useState(true);
 
   useEffect(() => {
     const fetchGamePredictions = async () => {
@@ -47,36 +56,75 @@ const App = () => {
       } catch (error) {
         // override the default "Faild to fetch" error message with a more descriptive one
         if (error.message === "Failed to fetch") {
-          setError(
+          setGamePredicitonError(
             "Error: The prediction server is currently unavailable. Please try again later!"
           );
         } else {
-          setError(error.message);
+          setGamePredicitonError(error.message);
         }
       } finally {
-        setLoading(false);
+        setLoadingGamePredictions(false);
       }
     };
 
     fetchGamePredictions();
+
+    const fetchPredictionModel = async () => {
+      try {
+        // send request to get prediction model JSON
+        const response = await fetch(
+          `${process.env.REACT_APP_BASE_API_URL}prediction-model/most-recent/`
+        );
+
+        // throw a custom error message that is more clear when the REST API endpoint doesn't reply
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData && errorData.detail
+              ? errorData.detail
+              : "The prediction server is currently unavailable. Please try again later!"
+          );
+        }
+
+        const data = await response.json();
+        setPredictionModel(data);
+      } catch (error) {
+        // override the default "Faild to fetch" error message with a more descriptive one
+        if (error.message === "Failed to fetch") {
+          setPredictionModelError(
+            "Error: The prediction server is currently unavailable. Please try again later!"
+          );
+        } else {
+          setPredictionModelError(error.message);
+        }
+      } finally {
+        setLoadingPredictionModel(false);
+      }
+    };
+
+    fetchPredictionModel();
   }, []);
+
+  useEffect(() => {
+    console.log(`predictionModel: ${JSON.stringify(predictionModel)}`);
+  }, [predictionModel]);
 
   return (
     <div className="app-container">
       <Header />
       <div className="page-body">
-        {!error && loading && (
+        {!gamePredictionsError && loadingGamePredictions && (
           <div className="spinner-container">
             <div className="spinner"></div>
           </div>
         )}
-        {error && !loading && (
+        {gamePredictionsError && !loadingGamePredictions && (
           <div className="error-message">
             <span className="error-message-title">Error: </span>
-            <span className="error-message-detail">{error}</span>
+            <span className="error-message-detail">{gamePredictionsError}</span>
           </div>
         )}
-        {!error && !loading && (
+        {!gamePredictionsError && !loadingGamePredictions && (
           <GamePredictions gamePredictions={predictions} />
         )}
       </div>
