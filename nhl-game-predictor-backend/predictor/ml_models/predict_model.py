@@ -14,8 +14,10 @@ from predictor.ml_models.train_model import create_seasons_dataframe, create_tra
 from lime.lime_tabular import LimeTabularExplainer
 from games.data_loader import load_team_data_for_date_from_api
 from django.db.models.query import QuerySet
+from sklearn.ensemble import RandomForestClassifier
+from typing import Tuple, Dict
 
-def load_random_forest_model():
+def load_random_forest_model() -> Tuple[RandomForestClassifier, PredictionModel]:
     """
     loads latest trained model from the file system
     """
@@ -181,4 +183,55 @@ def predict_games(games : QuerySet[Game]) -> list:
                                  fields=["home_team_data", "away_team_data"])
     
     return predictions
+
+
+def get_model_feature_importances() -> Dict[str, float]:
+    """
+    Get labeled feature importances for the most recently trained random forest model.
+    """
+
+    from predictor.ml_models.train_model import create_seasons_dataframe, create_training_data
+    from predictor.ml_models.utils import categorize_feature
+
+    # load the most recent model and construct the dataframe of training features
+    random_forest, prediction_model = load_random_forest_model()
+    trained_seasons = list(prediction_model.trained_seasons.values_list("id", flat=True))
+    seasons_dataframe = create_seasons_dataframe(trained_seasons)
+
+    training_features, _, _, _ = create_training_data(seasons_dataframe)
+
+    # find the list of importances and feature names used and ensure they're the same length
+    importances = random_forest.feature_importances_
+    feature_names = training_features.columns.tolist()
+
+    if len(importances) != len(feature_names):
+        raise ValueError(
+            f"Mismatch: {len(importances)} importances vs {len(feature_names)} feature names."
+        )
+    
+
+    feature_importance_df = (
+        pd.DataFrame({
+            "feature": feature_names,
+            "importance": importances
+        })
+        .sort_values(by="importance", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    feature_importance_df["category"] = feature_importance_df["feature"].apply(categorize_feature)
+
+    category_importances = (
+        feature_importance_df.groupby("category")["importance"]
+        .sum()
+        .sort_values(ascending=False)
+    )
+    print(category_importances)
+
+    feature_importances_dict = category_importances.to_dict()
+
+    print(feature_importances_dict)
+
+    return feature_importances_dict
+
 
