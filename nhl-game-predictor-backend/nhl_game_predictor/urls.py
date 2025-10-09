@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from games.views import FetchGamesFromNHLAPIByDateView, GameDetailView, GameListByDateView, GamePredictionByGameIdView, GamePredictionListByDateView, KeepActiveView, PredictGamesTodayView, UpdateCompletedGamesView
+from predictor.views import MostRecentPredictionModelDetailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,6 @@ urlpatterns = [
     path('api/predict-games-today/', PredictGamesTodayView.as_view(), name='predict-games-today'),
     path('api/keep-active/', KeepActiveView.as_view(), name='keep-active'),
     path('api/games/fetch-from-nhl-api/', FetchGamesFromNHLAPIByDateView.as_view(), name='fetch-games-from-nhl-api-by-date'),
-    path('api/update-completed-games/', UpdateCompletedGamesView.as_view(), name='update-completed-games')
+    path('api/update-completed-games/', UpdateCompletedGamesView.as_view(), name='update-completed-games'),
+    path('api/prediction-model/most-recent/', MostRecentPredictionModelDetailView.as_view(), name='most-recent-prediction-model')
 ]
