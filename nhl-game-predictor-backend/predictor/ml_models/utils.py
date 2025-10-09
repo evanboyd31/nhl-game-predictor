@@ -6,12 +6,58 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nhl_game_predictor_backend")
 django.setup()
 
 CATEGORICAL_FEATURE_NAMES = [
-        "home_team",
-        "away_team",
-        "game_type",
-        "game_day_of_week",
-        "game_month"
-    ]
+    "home_team",
+    "away_team",
+    "game_type",
+    "game_day_of_week",
+    "game_month"
+]
+
+NUMERIC_FEATURE_NAMES = [
+
+    "home_team_win_percentage",
+    "home_team_loss_percentage",
+    "home_team_ot_loss_percentage",
+    "home_team_goals_for_per_game",
+    "home_team_goals_against_per_game",
+    "home_team_goal_differential_per_game",
+
+    "home_team_l10_win_percentage",
+    "home_team_l10_loss_percentage",
+    "home_team_l10_ot_losses",
+    "home_team_l10_goals_for_per_game",
+    "home_team_l10_goals_against_per_game",
+    "home_team_l10_goal_differential_per_game",
+
+    "home_team_home_win_percentage",
+    "home_team_home_loss_percentage",
+    "home_team_home_ot_loss_percentage",
+    "home_team_home_goals_for_per_game",
+    "home_team_home_goals_against_per_game",
+    "home_team_home_goal_differential_per_game",
+
+    "away_team_win_percentage",
+    "away_team_loss_percentage",
+    "away_team_ot_loss_percentage",
+    "away_team_goals_for_per_game",
+    "away_team_goals_against_per_game",
+    "away_team_goal_differential_per_game",
+
+    "away_team_l10_win_percentage",
+    "away_team_l10_loss_percentage",
+    "away_team_l10_ot_losses",
+    "away_team_l10_goals_for_per_game",
+    "away_team_l10_goals_against_per_game",
+    "away_team_l10_goal_differential_per_game",
+
+    "away_team_road_win_percentage",
+    "away_team_road_loss_percentage",
+    "away_team_road_ot_loss_percentage",
+    "away_team_road_goals_for_per_game",
+    "away_team_road_goals_against_per_game",
+    "away_team_road_goal_differential_per_game",
+]
+
 
 # we only consider franchises that have participated in a game that is stored in the DB, not all franchises
 # otherwise, a lot of the data columns would go unused
@@ -210,3 +256,30 @@ class GameDataFrameEntry:
             # label is a simple binary decision of did the home team win or not
             "home_team_win": self.home_team_win,
         }
+    
+def categorize_feature(feature_name: str) -> str:
+    """
+    Return the categorical parent feature name if the column
+    is one-hot encoded; otherwise (it is a numerical feature) return the feature name itself.
+    """
+
+    # create a dictionary mapping the categorical feature names to their list of possible suffixes
+    categorical_possible_values = {
+        "home_team": POSSIBLE_GAME_FRANCHISE_IDS,
+        "away_team": POSSIBLE_GAME_FRANCHISE_IDS,
+        "game_type": GAME_TYPES,
+        "game_day_of_week": GAME_DAYS_OF_WEEK,
+        "game_month": GAME_MONTHS,
+    }
+
+    # create the list of all categorical names (things like game_type_2, etc)
+    categorical_names = []
+    for feature, values in categorical_possible_values.items():
+        categorical_names.extend([f"{feature}_{v}" for v in values])
+
+    # return the full categorical feature name
+    for prefix in categorical_names:
+        if feature_name == prefix:
+            return "_".join(prefix.split("_")[:-1])
+
+    return feature_name
