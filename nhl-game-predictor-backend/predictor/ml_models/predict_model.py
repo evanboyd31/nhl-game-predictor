@@ -226,11 +226,9 @@ def get_model_feature_importances() -> Dict[str, float]:
         .sum()
         .sort_values(ascending=False)
     )
-    print(category_importances)
 
     feature_importances_dict = category_importances.to_dict()
 
-    print(feature_importances_dict)
 
     return feature_importances_dict
 
