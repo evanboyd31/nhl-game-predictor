@@ -11,18 +11,33 @@ Chart.register(...registerables);
  * GamePredictionBarChart component
  */
 const extractGamePredictionData = (gamePrediction) => {
-  // extract descriptions and importances from top_features_descriptions
   const originalLabels = Object.keys(gamePrediction.top_features_descriptions);
   const importances = Object.values(
     gamePrediction.top_features_descriptions
-  ).map(
-    (feature) => feature[1] // importance score
+  ).map((feature) => feature[1]); // importance score
+
+  // Combine labels and importances into a single array and sort by descending order of importances
+  const combinedLabelsImportances = originalLabels.map((label, i) => ({
+    label,
+    importance: importances[i],
+  }));
+
+  combinedLabelsImportances.sort((a, b) => b.importance - a.importance);
+
+  // extract the labels and importances after sorting
+  const sortedLabels = combinedLabelsImportances.map((item) => item.label);
+  const sortedImportances = combinedLabelsImportances.map(
+    (item) => item.importance
   );
 
-  // use numeric labels for the chart
-  const legendLabels = originalLabels.map((_, index) => (index + 1).toString());
+  // Use numeric labels for chart
+  const legendLabels = sortedLabels.map((_, index) => (index + 1).toString());
 
-  return { legendLabels, originalLabels, importances };
+  return {
+    legendLabels,
+    originalLabels: sortedLabels,
+    importances: sortedImportances,
+  };
 };
 
 const GamePredictionBarChart = ({ gamePrediction }) => {

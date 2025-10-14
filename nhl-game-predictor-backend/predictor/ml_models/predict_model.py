@@ -57,9 +57,8 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
     top_features = sorted(exp.as_list(), 
-                          key=lambda top_feature: top_feature[1],
+                          key=lambda top_feature: abs(top_feature[1]),
                           reverse=True)
-    top_features_df = pd.DataFrame(top_features, columns=['Feature', 'Importance'])
     
     game_feature_values = game_data_frame_entry.to_dict()
 
@@ -67,10 +66,10 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     for top_feature in top_features:
         tokens = top_feature[0].split(" ")
-        importance_value = top_feature[1]
+        importance_value = abs(top_feature[1])
 
         # we would only like to display positive feature values to the user for clarity
-        if importance_value < 0:
+        if importance_value <= 0:
             break
 
         for token in tokens:
@@ -78,7 +77,7 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
                 cleaned_features.append([token, importance_value])
                 break
 
-        # exit if we have found 5 positive importance featuers
+        # exit if we have found the 5 most important features
         if len(cleaned_features) == 5:
             break
 
