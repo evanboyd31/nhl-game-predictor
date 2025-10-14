@@ -1,0 +1,60 @@
+.prediction-model-container {
+  width: 85%;
+  margin: 40px auto;
+  background-color: #1a1a1a; /* Match game-predictions dark theme */
+  padding: 25px;
+  border-radius: 10px;
+  border: 2px solid #ee983a; /* Match .item border */
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.prediction-model-header {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #ee983a; /* Use the same orange highlight */
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.prediction-model-description {
+  text-align: center;
+  color: #ffffff;
+  opacity: 0.8;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  font-weight: 300;
+  max-width: 600px;
+}
+
+.prediction-model-chart {
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  margin: 20px 0;
+  background-color: #111; /* Slight contrast to container */
+  border: 2px solid #328e44; /* Use the green tone */
+  border-radius: 10px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Optional: title section hover or subtle transition */
+.prediction-model-container:hover {
+  border-color: #328e44;
+  transition: border-color 0.3s ease;
+}
+
+/* Text color classes reused from game predictions */
+.orange-text {
+  color: #ee983a;
+}
+
+.green-text {
+  color: #328e44;
+}
