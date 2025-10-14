@@ -1,6 +1,7 @@
 import "./index.css";
 import Header from "./components/Header.js";
 import GamePredictions from "./components/GamePredictions.js";
+import PredictionModel from "./components/PredictionModel.js";
 import Footer from "./components/Footer.js";
 import { useState, useEffect } from "react";
 import formatToPacificTime from "./utils/timeUtils.js";
@@ -27,7 +28,7 @@ const App = () => {
   const [loadingPredictionModel, setLoadingPredictionModel] = useState(true);
 
   // holds the error returned by the prediction model API endpoint
-  const [predictionModelError, setPredictionModelError] = useState(true);
+  const [predictionModelError, setPredictionModelError] = useState(null);
 
   useEffect(() => {
     const fetchGamePredictions = async () => {
@@ -126,6 +127,10 @@ const App = () => {
         )}
         {!gamePredictionsError && !loadingGamePredictions && (
           <GamePredictions gamePredictions={predictions} />
+        )}
+
+        {!predictionModelError && !loadingPredictionModel && (
+          <PredictionModel predictionModel={predictionModel} />
         )}
       </div>
       <Footer />
