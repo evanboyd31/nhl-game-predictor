@@ -57,7 +57,10 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
     top_features = sorted(exp.as_list(), 
-                          key=lambda top_feature: abs(top_feature[1]),
+                          key=lambda top_feature: (
+                                top_feature[1] < 0, # positive values come first
+                                -abs(top_feature[1]) # then sort by descending magnitude 
+                              ),
                           reverse=True)
     
     game_feature_values = game_data_frame_entry.to_dict()
