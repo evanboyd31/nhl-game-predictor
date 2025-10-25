@@ -52,8 +52,12 @@ const GamePredictionBarChart = ({ gamePrediction }) => {
         label: "Importance",
         data: importances,
         color: "rgba(255, 255, 255, 1)",
-        backgroundColor: "rgba(238, 152, 58, 0.6)",
-        borderColor: "rgba(238, 152, 58, 1)",
+        backgroundColor: importances.map((val) =>
+          val >= 0 ? "#2e7d32" : "rgba(255, 99, 132, 0.6)"
+        ),
+        borderColor: importances.map((val) =>
+          val >= 0 ? "#4caf50" : "rgba(255, 99, 132, 1)"
+        ),
         borderWidth: 1,
       },
     ],
