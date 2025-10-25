@@ -66,11 +66,7 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     for top_feature in top_features:
         tokens = top_feature[0].split(" ")
-        importance_value = abs(top_feature[1])
-
-        # we would only like to display positive feature values to the user for clarity
-        if importance_value <= 0:
-            break
+        importance_value = top_feature[1]
 
         for token in tokens:
             if token in game_feature_values:
