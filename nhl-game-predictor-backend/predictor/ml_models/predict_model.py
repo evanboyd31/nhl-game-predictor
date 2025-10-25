@@ -35,18 +35,10 @@ def load_random_forest_model():
     
     return model, latest_model
 
-def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : pd.DataFrame, model, training_features : pd.DataFrame) -> dict:
+def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : pd.DataFrame, model, training_features : pd.DataFrame, explainer : LimeTabularExplainer) -> dict:
     """
     get the top 5 features driving the prediction outcome for a specific game
     """
-
-    # use lime explainer. class_names is the label we're trying to predict
-    explainer = LimeTabularExplainer(
-        training_data=training_features.values,
-        feature_names=training_features.columns.tolist(),
-        class_names=['home_team_win'],
-        mode='classification'
-    )
 
     # get the prediction probabilities for the specific instance
     instance = game_data_df.iloc[0:1]
@@ -84,7 +76,7 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     return top_features_dictionary
 
-def predict_game_outcome(game : Game, model, training_features : pd.DataFrame) -> GamePrediction:
+def predict_game_outcome(game : Game, model, training_features : pd.DataFrame, explainer : LimeTabularExplainer) -> GamePrediction:
     """
     predict the outcome of a game using the latest Random Forest model.
     """
@@ -109,7 +101,8 @@ def predict_game_outcome(game : Game, model, training_features : pd.DataFrame) -
     top_features = get_top_features(game_data_frame_entry=game_data_frame_entry,
                                     game_data_df=game_data_df,
                                     model=model,
-                                    training_features=training_features)
+                                    training_features=training_features,
+                                    explainer=explainer)
 
     # get the latest model instance for saving prediction
     prediction_model = PredictionModel.objects.order_by('-version').first()
@@ -144,6 +137,14 @@ def predict_games(games : QuerySet[Game]) -> list:
     # get training features
     training_features, _, _, _= create_training_data(seasons_dataframe)
 
+    # use lime explainer. class_names is the label we're trying to predict
+    explainer = LimeTabularExplainer(
+        training_data=training_features.values,
+        feature_names=training_features.columns.tolist(),
+        class_names=['home_team_win'],
+        mode='classification'
+    )
+
     predictions = []
     team_data = []
     games_data = []
@@ -163,7 +164,8 @@ def predict_games(games : QuerySet[Game]) -> list:
 
         game_prediction = predict_game_outcome(game=game,
                                                model=model,
-                                               training_features=training_features)
+                                               training_features=training_features,
+                                               explainer=explainer)
         predictions.append(game_prediction)
 
     # need to first create team data before bulk_updating the Games
