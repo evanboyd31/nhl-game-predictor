@@ -15,6 +15,14 @@ from lime.lime_tabular import LimeTabularExplainer
 from games.data_loader import load_team_data_for_date_from_api
 from django.db.models.query import QuerySet
 
+import re
+
+CATEGORICAL_REGEX = re.compile(r'^(?:home_team|away_team|game_type|game_day_of_week|game_month)_[0-9]+$')
+HOME_TEAM_REGEX = re.compile(r'^(?:home_team)_[0-9]+$')
+AWAY_TEAM_REGEX = re.compile(r'^(?:away_team)_[0-9]+$')
+GAME_DAY_OF_WEEK_REGEX = re.compile(r'^(?:game_day_of_week)_[0-9]+$')
+GAME_MONTH_REGEX = re.compile(r'^(?:game_month)_[0-9]+$')
+
 def load_random_forest_model():
     """
     loads latest trained model from the file system
@@ -40,12 +48,15 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
     get the top 5 features driving the prediction outcome for a specific game
     """
 
+    print(f"predicting for game {game_data_frame_entry.game}")
+
     # use lime explainer. class_names is the label we're trying to predict
     explainer = LimeTabularExplainer(
         training_data=training_features.values,
         feature_names=training_features.columns.tolist(),
         class_names=['home_team_win'],
-        mode='classification'
+        mode='classification',
+        random_state=31
     )
 
     # get the prediction probabilities for the specific instance
@@ -57,30 +68,75 @@ def get_top_features(game_data_frame_entry : GameDataFrameEntry, game_data_df : 
 
     # convert features into a list, and get their importance, and then clean the importances so feature values can be found
     top_features = sorted(exp.as_list(), 
-                          key=lambda top_feature: (
-                                top_feature[1] < 0, # positive values come first
-                                -abs(top_feature[1]) # then sort by descending magnitude 
-                              ),
+                          key=lambda top_feature: top_feature[1],
                           reverse=True)
     
     game_feature_values = game_data_frame_entry.to_dict()
 
-    cleaned_features = []
+    cleaned_features = set()
 
     for top_feature in top_features:
         tokens = top_feature[0].split(" ")
         importance_value = top_feature[1]
 
         for token in tokens:
-            if token in game_feature_values:
-                cleaned_features.append([token, importance_value])
-                break
+            is_categorical_feature = CATEGORICAL_REGEX.match(token)
 
-        # exit if we have found the 5 most important features
-        if len(cleaned_features) == 5:
-            break
+            if is_categorical_feature:
+                # we have 4 cases then
 
-    top_features_dictionary = {cleaned_feature[0] : [game_feature_values[cleaned_feature[0]], cleaned_feature[1]] for cleaned_feature in cleaned_features}
+                # case 1: home_team_{id}
+                is_home_team_feature = HOME_TEAM_REGEX.match(token)
+
+                if is_home_team_feature:
+                    # we only record the home team value, and the corresponding feature importance
+                    home_team_id = game_data_frame_entry.game.home_team.franchise.pk
+                    cleaned_features.add((f"home_team_{home_team_id}", importance_value))
+
+                # case 2: away_team_{id}
+                is_away_team_feature = AWAY_TEAM_REGEX.match(token)
+
+                if is_away_team_feature:
+                    # we only record the away team value, and the corresponding feature importance
+                    away_team_id = game_data_frame_entry.game.away_team.franchise.pk
+                    cleaned_features.add((f"away_team_{away_team_id}", importance_value))
+
+                # case 3: game_day_of_week_{day_index}
+                is_game_day_of_week_feature = GAME_DAY_OF_WEEK_REGEX.match(token)
+
+                if is_game_day_of_week_feature:
+                    game_day_of_week =  game_data_frame_entry.game.game_date.weekday()
+                    cleaned_features.add((f"game_day_of_week_{game_day_of_week}", importance_value))
+
+                # case 4: game_month_{month_index}
+                is_game_month_feature = GAME_MONTH_REGEX.match(token)
+
+                if is_game_month_feature:
+                    game_month = game_data_frame_entry.game.game_date.month
+                    cleaned_features.add((f"game_month_{game_month}", importance_value))
+
+            else:
+                if token in game_feature_values:
+                    cleaned_features.add((token, importance_value))
+    
+    cleaned_features = sorted(cleaned_features, key=lambda x: abs(x[1]), reverse=True)
+
+    top_features_dictionary = {}
+    for cleaned_feature, importance_value in cleaned_features:
+        key = cleaned_feature
+        if key in game_feature_values:
+            value = game_feature_values[key]
+        elif key.startswith("game_day_of_week_"):
+            value = game_data_frame_entry.game.game_date.weekday()
+        elif key.startswith("game_month_"):
+            value = game_data_frame_entry.game.game_date.month
+        elif key.startswith("home_team_"):
+            value = game_data_frame_entry.game.home_team.franchise.pk
+        elif key.startswith("away_team_"):
+            value = game_data_frame_entry.game.away_team.franchise.pk
+        else:
+            continue
+        top_features_dictionary[key] = [value, importance_value]
 
     return top_features_dictionary
 
