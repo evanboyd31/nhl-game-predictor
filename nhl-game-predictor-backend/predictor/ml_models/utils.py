@@ -76,6 +76,7 @@ class GameDataFrameEntry:
     """
 
     def __init__(self, game: Game):
+        self.game = game
         game_json = game.game_json
         home_team_data = game.home_team_data
         home_team_data_json = {} if home_team_data is None else home_team_data.team_data_json
