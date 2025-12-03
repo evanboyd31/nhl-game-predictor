@@ -23,6 +23,11 @@ RESULT_MAP = {
 REVERSE_RESULT_MAP = {v: k for k, v in RESULT_MAP.items()}
 
 def convert_game_json_to_game_data_objects(game_json : dict, date_string : str, get_team_data : bool = False):
+    """
+    converts a single game's JSON from the NHL API into Game and TeamData
+    Django model instances. Optionally, TeamData instances are created as well.
+    """
+
     game_id = game_json.get("id")
     game_date = datetime.strptime(date_string, "%Y-%m-%d").date()
     current_date = timezone.localdate()
@@ -341,6 +346,14 @@ def clear_database():
 
 @transaction.atomic
 def update_completed_games() -> list:
+    """
+    for all games in the database that have been completed but do not yet
+    have a winning team recorded, fetch the latest game JSON from the NHL API,
+    update the game_json field, and store the winning team. also fetch
+    TeamData for each team if it has not yet been created.
+    returns a list of all updated Game instances.
+    """
+
     today = timezone.localdate()
     completed_games_dates = Game.objects.filter(winning_team__isnull=True, game_date__lt=today).values_list("game_date", flat=True).distinct()
     games_to_update = []
